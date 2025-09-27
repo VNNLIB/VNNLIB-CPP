@@ -47,7 +47,7 @@ include_directories(
 # BNFC generation
 # ------------------------------------------------------------
 
-set(BNFC_INPUT ${CMAKE_SOURCE_DIR}/../../syntax.cf)
+set(BNFC_INPUT ${CMAKE_SOURCE_DIR}/grammar/syntax.cf)
 
 add_custom_command(
     OUTPUT

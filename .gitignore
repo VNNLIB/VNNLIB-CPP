@@ -1,0 +1,10 @@
+# Development environment
+.vscode
+__pycache__
+
+# BNFC generated files in parsers
+src/generated/
+
+# Build artifacts for parsers
+build/
+bin/

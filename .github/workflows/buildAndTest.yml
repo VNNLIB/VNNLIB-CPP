@@ -1,0 +1,44 @@
+name: build-and-test
+
+on:
+    workflow_dispatch:
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+              with:
+                submodules: recursive
+            
+            - name: Cache Haskell dependencies
+              uses: actions/cache@v3
+              with:
+                path: ~/.cabal
+                key: ${{ runner.os }}-cabal-${{ hashFiles('**/*.cabal') }}
+                restore-keys: |
+                  ${{ runner.os }}-cabal-
+            
+            - name: Install dependencies
+              run: |
+                sudo apt-get update
+                sudo apt-get install -y cabal-install ghc
+            
+            - name: Install Haskell dependencies
+              run: |
+                cabal update
+                cabal install alex happy BNFC
+                echo "$HOME/.cabal/bin" >> $GITHUB_PATH
+
+            - name: Build the project
+              run: |
+                echo "Building the parser"
+                mkdir -p build
+                cd build
+                cmake ..
+                make -j$(nproc)
+                echo "Build completed successfully"

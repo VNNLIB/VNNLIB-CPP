@@ -3,7 +3,9 @@
 #include <exception>
 #include <string>
 
-class VNNLibException : public std::exception {
+#include "VNNLibExport.h"
+
+class VNNLIB_API VNNLibException : public std::exception {
 private:
     std::string message_;
 public:

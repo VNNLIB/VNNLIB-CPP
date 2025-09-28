@@ -11,6 +11,7 @@
 
 #include "Absyn.H"
 #include "Printer.H"
+#include "VNNLibExport.h"
 
 
 using Shape = std::vector<int64_t>;
@@ -35,7 +36,7 @@ bool sameType(DType a, DType b);
 // Structure to store symbol information
 enum class SymbolKind {Input, Hidden, Output, Network, Unknown};
 
-class SymbolInfo final {
+class VNNLIB_API SymbolInfo final {
 public:
 	std::string name{};
 	std::string onnxName{};
@@ -55,7 +56,7 @@ public:
 
 // --- Base Node ---
 
-class TNode {
+class VNNLIB_API TNode {
 public:
 	virtual ~TNode() = default;
 	virtual void children(std::vector<const TNode*>& out) const = 0;
@@ -69,7 +70,7 @@ protected:
 	TNode& operator=(TNode&&) noexcept = default;
 };
 
-class TElementType : public TNode {
+class VNNLIB_API TElementType : public TNode {
 friend class TypedBuilder;
 public:
 	DType dtype{DType::Unknown};
@@ -82,7 +83,7 @@ protected:
 
 // --- Arithmetic Expressions ---
 
-class TArithExpr : public TNode {
+class VNNLIB_API TArithExpr : public TNode {
 friend class TypedBuilder;
 public:
 	DType dtype{DType::Unknown};
@@ -92,7 +93,7 @@ protected:
 	ArithExpr* src_ArithExpr{nullptr};
 };
 
-class TVarExpr final : public TArithExpr {
+class VNNLIB_API TVarExpr final : public TArithExpr {
 public:
 	std::shared_ptr<const SymbolInfo> symbol{};
 	Indices indices{};
@@ -100,43 +101,43 @@ public:
 	void children(std::vector<const TNode*>& out) const override;
 };
 
-class TLiteral : public TArithExpr {
+class VNNLIB_API TLiteral : public TArithExpr {
 public:
 	std::string lexeme;
 	int line{-1};
 	void children(std::vector<const TNode*>& out) const override;
 };
 
-class TFloat final : public TLiteral {
+class VNNLIB_API TFloat final : public TLiteral {
 public:
 	double value{};
 };
 
-class TInt final : public TLiteral {
+class VNNLIB_API TInt final : public TLiteral {
 public:
 	int64_t value{};
 };
 
-class TNegate final : public TArithExpr {
+class VNNLIB_API TNegate final : public TArithExpr {
 public:
 	std::unique_ptr<TArithExpr> expr;
 	void children(std::vector<const TNode*>& out) const override;
 };
 
-class TPlus final : public TArithExpr {
+class VNNLIB_API TPlus final : public TArithExpr {
 public:
 	std::vector<std::unique_ptr<TArithExpr>> args;
 	void children(std::vector<const TNode*>& out) const override;
 };
 
-class TMinus final : public TArithExpr {
+class VNNLIB_API TMinus final : public TArithExpr {
 public:
 	std::unique_ptr<TArithExpr> head;
 	std::vector<std::unique_ptr<TArithExpr>> rest;
 	void children(std::vector<const TNode*>& out) const override;
 };
 
-class TMultiply final : public TArithExpr {
+class VNNLIB_API TMultiply final : public TArithExpr {
 public:
 	std::vector<std::unique_ptr<TArithExpr>> args;
 	void children(std::vector<const TNode*>& out) const override;
@@ -144,7 +145,7 @@ public:
 
 // --- Boolean Expressions ---
 
-class TBoolExpr : public TNode {
+class VNNLIB_API TBoolExpr : public TNode {
 friend class TypedBuilder;
 public:
 	virtual ~TBoolExpr() = default;
@@ -153,31 +154,31 @@ protected:
 	BoolExpr* src_BoolExpr{nullptr};
 };
 
-class TCompare : public TBoolExpr {
+class VNNLIB_API TCompare : public TBoolExpr {
 public:
 	std::unique_ptr<TArithExpr> lhs, rhs;
 	void children(std::vector<const TNode*>& out) const override;
 };
 
-class TGreaterThan final : public TCompare {};
-class TLessThan final : public TCompare {};
-class TGreaterEqual final : public TCompare {};
-class TLessEqual final : public TCompare {};
-class TEqual final : public TCompare {};
-class TNotEqual final : public TCompare {};
+class VNNLIB_API TGreaterThan final : public TCompare {};
+class VNNLIB_API TLessThan final : public TCompare {};
+class VNNLIB_API TGreaterEqual final : public TCompare {};
+class VNNLIB_API TLessEqual final : public TCompare {};
+class VNNLIB_API TEqual final : public TCompare {};
+class VNNLIB_API TNotEqual final : public TCompare {};
 
-class TConnective : public TBoolExpr {
+class VNNLIB_API TConnective : public TBoolExpr {
 public:
 	std::vector<std::unique_ptr<TBoolExpr>> args;
 	void children(std::vector<const TNode*>& out) const override;
 };
 
-class TAnd final : public TConnective {};
-class TOr final : public TConnective {};
+class VNNLIB_API TAnd final : public TConnective {};
+class VNNLIB_API TOr final : public TConnective {};
 
 // --- Assertion ---
 
-class TAssertion final : public TNode {
+class VNNLIB_API TAssertion final : public TNode {
 friend class TypedBuilder;
 public:
 	std::unique_ptr<TBoolExpr> cond;
@@ -189,7 +190,7 @@ protected:
 
 // --- Definitions ---
 
-class TInputDefinition final : public TNode {
+class VNNLIB_API TInputDefinition final : public TNode {
 friend class TypedBuilder;
 public:
 	std::shared_ptr<const SymbolInfo> symbol{};
@@ -199,7 +200,7 @@ protected:
 	InputDefinition* src_InputDefinition{nullptr};
 };
 
-class THiddenDefinition final : public TNode {
+class VNNLIB_API THiddenDefinition final : public TNode {
 friend class TypedBuilder;
 public:
 	std::shared_ptr<const SymbolInfo> symbol{};
@@ -209,7 +210,7 @@ protected:
 	HiddenDefinition* src_HiddenDefinition{nullptr};
 };
 
-class TOutputDefinition final : public TNode {
+class VNNLIB_API TOutputDefinition final : public TNode {
 friend class TypedBuilder;
 public:
 	std::shared_ptr<const SymbolInfo> symbol{};
@@ -221,7 +222,7 @@ protected:
 
 // --- Network ---
 
-class TNetworkDefinition final : public TNode {
+class VNNLIB_API TNetworkDefinition final : public TNode {
 friend class TypedBuilder;
 public:
 	std::string isometricTo{};
@@ -238,7 +239,7 @@ protected:
 
 // --- Version ---
 
-class TVersion final : public TNode {
+class VNNLIB_API TVersion final : public TNode {
 friend class TypedBuilder;
 public:
 	int major{0};
@@ -251,7 +252,7 @@ protected:
 
 // --- Query ---
 
-class TQuery final : public TNode {
+class VNNLIB_API TQuery final : public TNode {
 friend class TypedBuilder;
 public:
 	std::unique_ptr<TVersion> version{};

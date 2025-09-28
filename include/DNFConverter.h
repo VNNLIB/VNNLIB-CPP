@@ -11,12 +11,13 @@
 
 #include "TypedAbsyn.h"
 #include "Absyn.H"
+#include "VNNLibExport.h"
 
 using Literal = const TCompare*;                // A Boolean literal is a comparison (e.g., x <= 5)
 using Clause = std::vector<Literal>;            // A clause is a conjunction of literals 
 using DNF    = std::vector<Clause>;             // DNF is a disjunction of clauses
 
-DNF toDNF(const TBoolExpr* node);
+VNNLIB_API DNF toDNF(const TBoolExpr* node);
 DNF dnfOf(const TBoolExpr* node);
 DNF dnfOr(const std::vector<std::unique_ptr<TBoolExpr>>& args);
 DNF dnfAnd(const std::vector<std::unique_ptr<TBoolExpr>>& args);

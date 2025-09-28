@@ -5,16 +5,18 @@
 #include <memory>
 #include <iostream>
 #include <iomanip>
+
 #include <unordered_map>
 #include "TypedAbsyn.h"
 #include "Error.hpp"
+#include "VNNLibExport.h"
 
 /**
  * @brief Represents a linear arithmetic expression of the form:
  *        c0 + c1*x1 + c2*x2 + ... + cn*xn
  * 
  */
-class LinearArithExpr {
+class VNNLIB_API LinearArithExpr {
 public:
     struct Term {
         double coeff;           // Coefficient of the variable
@@ -80,4 +82,4 @@ public:
  * @return A unique_ptr to LinearArithExpr representing the linearized form.
  * @throws VNNLibException if the expression is non-linear.
  */
-std::unique_ptr<LinearArithExpr> linearize(const TArithExpr* arithExpr);
+VNNLIB_API std::unique_ptr<LinearArithExpr> linearize(const TArithExpr* arithExpr);

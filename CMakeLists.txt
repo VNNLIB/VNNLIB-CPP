@@ -160,11 +160,20 @@ add_library(VNNLib SHARED
     ${GENERATED_SRCS}
 )
 
-# Ensure parser generation happens before building library
+# Ensure parser generation before building
 add_dependencies(VNNLib BNFCGen ParserGen)
+
+target_include_directories(VNNLib
+    PUBLIC
+        ${INCLUDE_DIR}       
+    PRIVATE
+        ${INCLUDE_DIR}/util  
+        ${GENERATED_DIR}     
+)
 
 if(UNIX)
     target_link_libraries(VNNLib m)
+    target_compile_options(VNNLib PRIVATE -fvisibility=hidden)
 endif()
 
 # ------------------------------------------------------------

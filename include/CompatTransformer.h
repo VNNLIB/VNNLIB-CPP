@@ -10,21 +10,22 @@
 #include "DNFConverter.h"
 #include "LinearArithExpr.h"
 #include "Error.hpp"
+#include "VNNLibExport.h"
 
 
 // Represents a linear inequality of the form: coeffs * x <= rhs
-struct Polytope {
+struct VNNLIB_API Polytope {
     std::vector<std::vector<double>> coeffMatrix;       // Coefficients of the inequalities (rows: inequalities, cols: variables)
-    std::vector<double> rhs;                         // Right-hand side values of the inequalities
+    std::vector<double> rhs;                            // Right-hand side values of the inequalities
 };
 
 using Box = std::vector<std::pair<double, double>>;     // A box defined by (lower, upper) pairs for each dimension
 using PolyUnion = std::vector<Polytope>;                // A union of polytopes
 
 // A single reachability specification case with input bounds and output constraints
-struct SpecCase {
-    Box inputBox;                                           // Input bounds as a box
-    PolyUnion outputConstraints{};                            // Output constraints as a union of polytopes
+struct VNNLIB_API SpecCase {
+    Box inputBox;                                       // Input bounds as a box
+    PolyUnion outputConstraints{};                      // Output constraints as a union of polytopes
 };
 
 // Class to transform a typed AST into a simple reachability-style specification

@@ -27,14 +27,14 @@ endif()
 # Directories
 # ------------------------------------------------------------
 
-set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
+set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(GENERATED_DIR ${SRC_DIR}/generated)
-set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
+set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Output directories
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 # Includes
 include_directories(
@@ -47,7 +47,7 @@ include_directories(
 # BNFC generation
 # ------------------------------------------------------------
 
-set(BNFC_INPUT ${CMAKE_SOURCE_DIR}/grammar/syntax.cf)
+set(BNFC_INPUT ${CMAKE_CURRENT_SOURCE_DIR}/grammar/syntax.cf)
 
 add_custom_command(
     OUTPUT

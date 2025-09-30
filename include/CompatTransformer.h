@@ -37,7 +37,7 @@ public:
     SymbolInfo* inputSymbol = nullptr;                                 // Information about the input variable
     SymbolInfo* outputSymbol = nullptr;                                // Information about the output variable
 
-    std::vector<SpecCase> transform();
+    VNNLIB_API std::vector<SpecCase> transform();
     static std::string caseToString(const SpecCase& c);
 
 private:

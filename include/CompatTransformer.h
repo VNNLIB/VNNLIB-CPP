@@ -31,7 +31,7 @@ struct VNNLIB_API SpecCase {
 // Class to transform a typed AST into a simple reachability-style specification
 class CompatTransformer {
 public: 
-    CompatTransformer(const TQuery* query);
+    VNNLIB_API CompatTransformer(const TQuery* query);
     ~CompatTransformer() = default;
 
     SymbolInfo* inputSymbol = nullptr;                                 // Information about the input variable

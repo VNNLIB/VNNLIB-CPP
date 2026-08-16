@@ -147,6 +147,7 @@ endif()
 
 set(MAIN_SRCS
     ${SRC_DIR}/VNNLib.cpp
+    ${SRC_DIR}/Solver.cpp
     ${SRC_DIR}/TypeChecker.cpp
     ${SRC_DIR}/TypedAST.cpp
     ${SRC_DIR}/TypedBuilder.cpp

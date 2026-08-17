@@ -1,8 +1,10 @@
 #pragma once
 
+#include <optional>
 #include <string>
-
+#include <unordered_map>
 #include "VNNLibExport.h"
+
 
 
 namespace vnnlib::solver {
@@ -22,5 +24,13 @@ class VNNLIB_API Solver {
 
     public:
     explicit Solver(const std::string& executable);
+
+    VerificationResult verify(
+    const std::string& query,
+    const std::unordered_map<std::string, std::string>& networks,
+    std::optional<int> timeout = std::nullopt);
+
+
 };
+
 }

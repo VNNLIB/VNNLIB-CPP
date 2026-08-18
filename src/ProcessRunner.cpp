@@ -1,6 +1,7 @@
 #include "ProcessRunner.h"
 #include <unistd.h>
 #include <sys/wait.h>
+#include <stdexcept>
 
 using namespace vnnlib::solver;
 
@@ -11,23 +12,23 @@ vnnlib::solver::ProcessResult runProcess(
     // Create the pipes for communication between the processes
     int stdout_pipe[2];
     if (pipe(stdout_pipe) == -1) {
-        // Pipe creation failed
+        throw std::runtime_error("Error creating pipe.");
     }
 
     // Create a fork of the current process
     pid_t pid = fork();
 
     if (pid < 0) {
-        // Fork failed - abort
+        throw std::runtime_error("Error forking process.");
     } else if (pid == 0) { // Child process
         // Close the read end of pipe
         if (close(stdout_pipe[0]) == -1) {
-            // Close failed
+            throw std::runtime_error("Error closing pipe.");
         }
 
         // Set the stdout of the child process to the write end of the pipe
         if (dup2(stdout_pipe[1], STDOUT_FILENO) == -1) {
-            // Duplication failed
+            throw std::runtime_error("Error duplicating stdout file descriptor.");
         }
 
         // Convert arguments into array of char *
@@ -41,13 +42,13 @@ vnnlib::solver::ProcessResult runProcess(
     } else { // Parent process
         // Close the write end of pipe
         if (close(stdout_pipe[1]) == -1) {
-            // Close failed
+            throw std::runtime_error("Error closing pipe.");
         }
 
         // Check that the child process has successfully finished
         int status;
         if (wait(&status) == -1) {
-            // The waiting failed so exit as soon as possible (program is in an unknown state)
+            throw std::runtime_error("Error waiting for solver " + executable + " to finish.");
         }
 
         // Initialise the result

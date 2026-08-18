@@ -45,6 +45,24 @@ vnnlib::solver::ProcessResult runProcess(
             throw std::runtime_error("Error closing pipe.");
         }
 
+        // Read the solver's stdout
+        std::string output;
+        char buffer[100]; // Read 100 bytes at a time
+        while (true) {
+            ssize_t bytes = read(stdout_pipe[0], buffer, sizeof(buffer));
+            if (bytes <= 0) break;
+            output.append((char *) buffer, bytes);
+        }
+        close(stdout_pipe[0]);
+
+        // Read the solver's stderr
+        std::string error;
+        // while (true) {
+        //     ssize_t bytes = read(nullptr, buffer, sizeof(buffer));
+        //     if (bytes < 0) break;
+        //     error.append((char *) buffer, bytes)
+        // }
+
         // Check that the child process has successfully finished
         int status;
         if (wait(&status) == -1) {
@@ -53,9 +71,8 @@ vnnlib::solver::ProcessResult runProcess(
 
         // Initialise the result
         vnnlib::solver::ProcessResult result;
-
-        result.stdoutText = stdout_pipe[0]; // still an FD so need to read from this
-        result.stderrText = nullptr;
+        result.stdoutText = output;
+        result.stderrText = error;
 
         // Check if the program exited normally
         if (WIFEXITED(status)) {

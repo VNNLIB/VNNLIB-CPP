@@ -14,13 +14,22 @@ vnnlib::solver::ProcessResult runProcess(
         // Fork failed - abort
     } else if (pid == 0) { // Child process
         // Convert arguments into array of char *
-        std::vector<const char *> args;
-        for (const auto& argument : arguments) args.push_back(argument.data());
+        std::vector<char *> args;
+        args.push_back(const_cast<char *>(executable.c_str())); // Arguments are in the form {executable, arg1, arg2, ...}
+        for (const auto& argument : arguments) args.push_back(const_cast<char *>(argument.c_str()));
         args.push_back(nullptr);
 
         // Run the process (using an empty environment)
-        execve(executable.c_str(), args.data(), nullptr);
-    } else {
-        // Parent process - wait for solver to execute
+        execvp(args[0], args.data());
+    } else { // Parent process
+        // Check that the child process has successfully finished
+        int status;
+        if (waitpid(pid, &status, 0) == -1) {
+            // The waiting failed so exit as soon as possible (program is in an unknown state)
+        }
     }
+
+    vnnlib::solver::ProcessResult result = vnnlib::solver::ProcessResult();
+
+    return result;
 }

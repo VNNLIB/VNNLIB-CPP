@@ -153,6 +153,7 @@ set(MAIN_SRCS
     ${SRC_DIR}/LinearArithExpr.cpp
     ${SRC_DIR}/CompatTransformer.cpp
     ${SRC_DIR}/DNFConverter.cpp
+    ${SRC_DIR}/ProcessRunner.cpp
 )
 
 set(PARSER_MAIN

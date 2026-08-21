@@ -11,7 +11,8 @@ vnnlib::solver::ProcessResult runProcess(
 ) {
     // Create the pipes for communication between the processes
     int stdout_pipe[2];
-    if (pipe(stdout_pipe) == -1) {
+    int stderr_pipe[2];
+    if (pipe(stdout_pipe) == -1 || pipe(stderr_pipe) == -1) {
         throw std::runtime_error("Error creating pipe.");
     }
 
@@ -21,8 +22,8 @@ vnnlib::solver::ProcessResult runProcess(
     if (pid < 0) {
         throw std::runtime_error("Error forking process.");
     } else if (pid == 0) { // Child process
-        // Close the read end of pipe
-        if (close(stdout_pipe[0]) == -1) {
+        // Close the read end of pipes
+        if (close(stdout_pipe[0]) == -1 || close(stderr_pipe[0] == -1)) {
             throw std::runtime_error("Error closing pipe.");
         }
 
@@ -31,17 +32,21 @@ vnnlib::solver::ProcessResult runProcess(
             throw std::runtime_error("Error duplicating stdout file descriptor.");
         }
 
+        // Set the stderr of the child process to the write end of the pipe
+        if (dup2(stderr_pipe[1], STDERR_FILENO) == -1) {
+            throw std::runtime_error("Error duplicating stderr file descriptor.");
+        }
+
         // Convert arguments into array of char *
         std::vector<char *> args;
-        args.push_back(const_cast<char *>(executable.c_str())); // Arguments are in the form {executable, arg1, arg2, ...}
+        args.push_back(const_cast<char *>(executable.c_str())); // Arguments are in the form {executable, arg1, arg2, ..., null}
         for (const auto& argument : arguments) args.push_back(const_cast<char *>(argument.c_str()));
         args.push_back(nullptr);
 
-        // Run the process (using an empty environment)
         execvp(args[0], args.data());
     } else { // Parent process
-        // Close the write end of pipe
-        if (close(stdout_pipe[1]) == -1) {
+        // Close the write end of pipes
+        if (close(stdout_pipe[1]) == -1 || close(stderr_pipe[1]) == -1) {
             throw std::runtime_error("Error closing pipe.");
         }
 
@@ -57,11 +62,12 @@ vnnlib::solver::ProcessResult runProcess(
 
         // Read the solver's stderr
         std::string error;
-        // while (true) {
-        //     ssize_t bytes = read(nullptr, buffer, sizeof(buffer));
-        //     if (bytes < 0) break;
-        //     error.append((char *) buffer, bytes)
-        // }
+        while (true) {
+            ssize_t bytes = read(stderr_pipe[0], buffer, sizeof(buffer));
+            if (bytes < 0) break;
+            error.append((char *) buffer, bytes);
+        }
+        close(stderr_pipe[0]);
 
         // Check that the child process has successfully finished
         int status;

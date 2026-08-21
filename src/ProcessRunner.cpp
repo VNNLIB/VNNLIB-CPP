@@ -16,6 +16,9 @@ vnnlib::solver::ProcessResult runProcess(
         throw std::runtime_error("Error creating pipe.");
     }
 
+    // Initialise the result
+    ProcessResult result;
+
     // Create a fork of the current process
     pid_t pid = fork();
 
@@ -23,7 +26,7 @@ vnnlib::solver::ProcessResult runProcess(
         throw std::runtime_error("Error forking process.");
     } else if (pid == 0) { // Child process
         // Close the read end of pipes
-        if (close(stdout_pipe[0]) == -1 || close(stderr_pipe[0] == -1)) {
+        if (close(stdout_pipe[0]) == -1 || close(stderr_pipe[0]) == -1) {
             throw std::runtime_error("Error closing pipe.");
         }
 
@@ -64,7 +67,7 @@ vnnlib::solver::ProcessResult runProcess(
         std::string error;
         while (true) {
             ssize_t bytes = read(stderr_pipe[0], buffer, sizeof(buffer));
-            if (bytes < 0) break;
+            if (bytes <= 0) break;
             error.append((char *) buffer, bytes);
         }
         close(stderr_pipe[0]);
@@ -75,8 +78,7 @@ vnnlib::solver::ProcessResult runProcess(
             throw std::runtime_error("Error waiting for solver " + executable + " to finish.");
         }
 
-        // Initialise the result
-        vnnlib::solver::ProcessResult result;
+        // Set the fields of the result object
         result.stdoutText = output;
         result.stderrText = error;
 
@@ -87,7 +89,7 @@ vnnlib::solver::ProcessResult runProcess(
             result.exitedNormally = false;
         }
         result.exitCode = WEXITSTATUS(status);
-
-        return result;
     }
+
+    return result;
 }

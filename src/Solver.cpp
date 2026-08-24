@@ -2,6 +2,7 @@
 #include "Error.hpp"
 #include "Solver.h"
 #include <vector>
+#include <sstream>
 
 
 namespace {
@@ -79,6 +80,77 @@ std::vector<std::string> buildSupportsArguments(
 
     return {"supports", argument};
 }
+
+
+
+
+
+//Split output into lines
+std::vector<std::string> splitLines(const std::string& output)
+{
+    std::vector<std::string> lines;
+    std::istringstream stream(output);
+    std::string line;
+
+    while (std::getline(stream, line)) {
+        if (!line.empty() && line.back() == '\r') {
+            line.pop_back();
+        }
+
+        lines.push_back(line);
+    }
+
+    return lines;
+}
+
+//Parse version range
+vnnlib::solver::VersionRange parseVersionRange(
+    const std::string& output)
+{
+    std::vector<std::string> lines = splitLines(output);
+
+    if (lines.size() != 2 || lines[0].empty() || lines[1].empty()) {
+        throw VNNLibException("Malformed version range output");
+    }
+
+    return {lines[0], lines[1]};
+}
+
+//Parse list output
+std::vector<std::string> parseSupportList(
+    const std::string& output)
+{
+    std::vector<std::string> lines = splitLines(output);
+
+    for (const std::string& line : lines) {
+        if (line.empty()) {
+            throw VNNLibException("Malformed support list output");
+        }
+    }
+
+    return lines;
+}
+
+//Parse boolean output
+bool parseSupportBoolean(const std::string& output)
+{
+    std::vector<std::string> lines = splitLines(output);
+
+    if (lines.size() != 1) {
+        throw VNNLibException("Malformed boolean support output");
+    }
+
+    if (lines[0] == "true") {
+        return true;
+    }
+
+    if (lines[0] == "false") {
+        return false;
+    }
+
+    throw VNNLibException("Malformed boolean support output");
+}
+
 
 
 

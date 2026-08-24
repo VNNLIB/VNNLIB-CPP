@@ -131,6 +131,10 @@ std::vector<std::string> parseSupportList(
     return lines;
 }
 
+
+
+
+
 //Parse boolean output
 bool parseSupportBoolean(const std::string& output)
 {
@@ -151,7 +155,36 @@ bool parseSupportBoolean(const std::string& output)
     throw VNNLibException("Malformed boolean support output");
 }
 
+//Parse operator output
+std::vector<vnnlib::solver::OperatorSupport> parseOperatorSupport(
+    const std::string& output)
+{
+    std::vector<vnnlib::solver::OperatorSupport> operators;
+    std::vector<std::string> lines = splitLines(output);
 
+    for (const std::string& line : lines) {
+        if (line.empty()) {
+            throw VNNLibException("Malformed operator support output");
+        }
+
+        std::istringstream stream(line);
+        vnnlib::solver::OperatorSupport operatorSupport;
+
+        if (!(stream >> operatorSupport.name)) {
+            throw VNNLibException("Malformed operator support output");
+        }
+
+        std::string elementType;
+
+        while (stream >> elementType) {
+            operatorSupport.elementTypes.push_back(elementType);
+        }
+
+        operators.push_back(operatorSupport);
+    }
+
+    return operators;
+}
 
 
 
@@ -184,6 +217,7 @@ vnnlib::solver::VerificationResult parseVerificationResult(
     throw VNNLibException("Malformed solver output: "+ result);
 }
 }
+
 
 
 namespace vnnlib::solver {

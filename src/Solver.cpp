@@ -29,6 +29,59 @@ std::vector<std::string> buildVerifyArguments(
 }
 
 
+
+//Build supports command args
+std::vector<std::string> buildSupportsArguments(
+    vnnlib::solver::Capability capability)
+{
+    using vnnlib::solver::Capability;
+
+    std::string argument;
+
+    switch (capability) {
+        case Capability::OnnxOpsetVersions:
+            argument = "--onnx-opset-versions";
+            break;
+        case Capability::OnnxElementTypes:
+            argument = "--onnx-element-types";
+            break;
+        case Capability::OnnxOperators:
+            argument = "--onnx-operators";
+            break;
+        case Capability::VNNLibVersions:
+            argument = "--vnnlib-versions";
+            break;
+        case Capability::HiddenNodeTheories:
+            argument = "--hidden-node-theories";
+            break;
+        case Capability::MultipleInputOutputTheories:
+            argument = "--multiple-input-output-theories";
+            break;
+        case Capability::MultipleNetworkTheories:
+            argument = "--multiple-network-theories";
+            break;
+        case Capability::MultipleNodeComparisonTheories:
+            argument = "--multiple-node-comparison-theories";
+            break;
+        case Capability::ArithmeticComplexityTheories:
+            argument = "--arithmetic-complexity-theories";
+            break;
+        case Capability::OptimisedDisjunctiveReasoning:
+            argument = "--optimised-disjunctive-reasoning";
+            break;
+        case Capability::SerialiseAssignments:
+            argument = "--serialise-assignments";
+            break;
+        default:
+            throw VNNLibException("Unknown solver capability");
+    }
+
+    return {"supports", argument};
+}
+
+
+
+
 //Read verify result
 vnnlib::solver::VerificationResult parseVerificationResult(
     const std::string& output)

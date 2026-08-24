@@ -3,8 +3,9 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
+#include <variant>
+#include <vector>
 #include "VNNLibExport.h"
-
 
 
 namespace vnnlib::solver {
@@ -15,6 +16,38 @@ enum class VerificationResult {
     Unknown,
     TimedOut
 };
+
+enum class Capability {
+    OnnxOpsetVersions,
+    OnnxElementTypes,
+    OnnxOperators,
+    VNNLibVersions,
+    HiddenNodeTheories,
+    MultipleInputOutputTheories,
+    MultipleNetworkTheories,
+    MultipleNodeComparisonTheories,
+    ArithmeticComplexityTheories,
+    OptimisedDisjunctiveReasoning,
+    SerialiseAssignments
+};
+
+struct VNNLIB_API VersionRange {
+    std::string minimum;
+    std::string maximum;
+};
+
+// empty element types means all reported types
+struct VNNLIB_API OperatorSupport {
+    std::string name;
+    std::vector<std::string> elementTypes;
+};
+
+using SupportResult = std::variant<
+    VersionRange,
+    std::vector<std::string>,
+    std::vector<OperatorSupport>,
+    bool
+>;
 
 
 

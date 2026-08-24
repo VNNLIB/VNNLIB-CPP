@@ -2,6 +2,8 @@
 #include "Solver.h"
 #include <vector>
 #include <sstream>
+#include <algorithm>
+
 
 
 namespace {
@@ -83,7 +85,6 @@ std::vector<std::string> buildSupportsArguments(
 
 
 
-
 //Split output into lines
 std::vector<std::string> splitLines(const std::string& output)
 {
@@ -102,6 +103,8 @@ std::vector<std::string> splitLines(const std::string& output)
     return lines;
 }
 
+
+
 //Parse version range
 vnnlib::solver::VersionRange parseVersionRange(
     const std::string& output)
@@ -114,6 +117,8 @@ vnnlib::solver::VersionRange parseVersionRange(
 
     return {lines[0], lines[1]};
 }
+
+
 
 //Parse list output
 std::vector<std::string> parseSupportList(
@@ -129,7 +134,6 @@ std::vector<std::string> parseSupportList(
 
     return lines;
 }
-
 
 
 
@@ -153,6 +157,9 @@ bool parseSupportBoolean(const std::string& output)
 
     throw VNNLibException("Malformed boolean support output");
 }
+
+
+
 
 //Parse operator output
 std::vector<vnnlib::solver::OperatorSupport> parseOperatorSupport(
@@ -184,6 +191,73 @@ std::vector<vnnlib::solver::OperatorSupport> parseOperatorSupport(
 
     return operators;
 }
+
+
+
+//Parse theory list
+std::vector<std::string> parseTheoryList(
+    const std::string& output,
+    const std::vector<std::string>& allowed)
+{
+    std::vector<std::string> values = parseSupportList(output);
+
+    for (const std::string& value : values) {
+        if (std::find(allowed.begin(), allowed.end(), value) == allowed.end()) {
+            throw VNNLibException("Malformed theory support output");
+        }
+    }
+
+    return values;
+}
+
+
+
+//Parse supports result
+vnnlib::solver::SupportResult parseSupportResult(
+    vnnlib::solver::Capability capability,
+    const std::string& output)
+{
+    using vnnlib::solver::Capability;
+
+    switch (capability) {
+        case Capability::OnnxOpsetVersions:
+        case Capability::VNNLibVersions:
+            return parseVersionRange(output);
+
+        case Capability::OnnxElementTypes:
+            return parseSupportList(output);
+
+        case Capability::OnnxOperators:
+            return parseOperatorSupport(output);
+
+        case Capability::HiddenNodeTheories:
+            return parseTheoryList(output, {"NH", "H"});
+
+        case Capability::MultipleInputOutputTheories:
+            return parseTheoryList(output, {"SIO", "MIO"});
+
+        case Capability::MultipleNetworkTheories:
+            return parseTheoryList(
+                output,
+                {"SNET", "MNET", "MENET", "MINET"});
+
+        case Capability::MultipleNodeComparisonTheories:
+            return parseTheoryList(output, {"SNC", "MNC"});
+
+        case Capability::ArithmeticComplexityTheories:
+            return parseTheoryList(
+                output,
+                {"BND", "OUTC", "LIN", "POLY"});
+
+        case Capability::OptimisedDisjunctiveReasoning:
+        case Capability::SerialiseAssignments:
+            return parseSupportBoolean(output);
+
+        default:
+            throw VNNLibException("Unknown solver capability");
+    }
+}
+
 
 
 

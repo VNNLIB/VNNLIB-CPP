@@ -63,6 +63,7 @@ class VNNLIB_API Solver {
     const std::unordered_map<std::string, std::string>& networks,
     std::optional<int> timeout = std::nullopt);
 
+    SupportResult supports(Capability capability);
 
 };
 

@@ -4,7 +4,7 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
-
+#include "ProcessRunner.h"
 
 
 namespace {
@@ -310,6 +310,16 @@ VerificationResult Solver::verify(
     ProcessResult result = runProcess(executable_, arguments);
 
     return parseVerificationResult(result.stdoutText);
+}
+
+SupportResult Solver::supports(Capability capability)
+{
+    std::vector<std::string> arguments =
+        buildSupportsArguments(capability);
+
+    ProcessResult result = runProcess(executable_, arguments);
+
+    return parseSupportResult(capability, result.stdoutText);
 }
 
 }

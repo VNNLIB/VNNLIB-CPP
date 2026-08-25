@@ -5,7 +5,7 @@
 
 using namespace vnnlib::solver;
 
-vnnlib::solver::ProcessResult runProcess(
+vnnlib::solver::ProcessResult vnnlib::solver::runProcess(
     const std::string& executable, 
     const std::vector<std::string>& arguments
 ) {

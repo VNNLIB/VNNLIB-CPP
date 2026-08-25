@@ -1,3 +1,4 @@
+#include "ProcessRunner.h"
 #include "Error.hpp"
 #include "Solver.h"
 #include <vector>
@@ -64,4 +65,18 @@ namespace vnnlib::solver {
 Solver::Solver(const std::string& executable)
     : executable_(executable) {
 }
+
+VerificationResult Solver::verify(
+    const std::string& query,
+    const std::unordered_map<std::string, std::string>& networks,
+    std::optional<int> timeout)
+{
+    std::vector<std::string> arguments =
+        buildVerifyArguments(query, networks, timeout);
+
+    ProcessResult result = runProcess(executable_, arguments);
+
+    return parseVerificationResult(result.stdoutText);
+}
+
 }

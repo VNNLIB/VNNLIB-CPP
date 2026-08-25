@@ -1,5 +1,6 @@
 #include "LinearArithExpr.h"
 
+namespace vnnlib::query {
 // Constructors and Destructor
 LinearArithExpr::LinearArithExpr() : constant_(0.0) {}
 
@@ -228,3 +229,4 @@ std::unique_ptr<LinearArithExpr> linearize(const TArithExpr* arithExpr) {
     result->simplify();
     return result;
 }
+} // namespace vnnlib::query

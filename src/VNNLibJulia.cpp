@@ -13,6 +13,9 @@ CxxWrap currently does not support class enums directly,
 so we provide a "classical" enum with conversion functions.
 */
 
+using vnnlib::query::LinearArithExpr;
+using vnnlib::query::linearize;
+
 enum JuliaDType {
     DReal,
     DF16,

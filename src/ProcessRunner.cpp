@@ -2,8 +2,21 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdexcept>
+#include <thread>
 
 using namespace vnnlib::solver;
+
+namespace {
+    void readFromPipe(int source, std::string& out) {
+        char buffer[100]; // Read 100 bytes at a time
+        while (true) {
+            ssize_t bytes = read(source, buffer, sizeof(buffer));
+            if (bytes <= 0) break;
+            out.append((char *) buffer, bytes);
+        }
+        close(source);
+    }
+}
 
 vnnlib::solver::ProcessResult vnnlib::solver::runProcess(
     const std::string& executable, 
@@ -17,7 +30,8 @@ vnnlib::solver::ProcessResult vnnlib::solver::runProcess(
     }
 
     // Initialise the result
-    ProcessResult result;
+    vnnlib::solver::ProcessResult result;
+    result.exitedNormally = false;
 
     // Create a fork of the current process
     pid_t pid = fork();
@@ -47,30 +61,21 @@ vnnlib::solver::ProcessResult vnnlib::solver::runProcess(
         args.push_back(nullptr);
 
         execvp(args[0], args.data());
+        throw std::runtime_error("The solver could not be executed.");
     } else { // Parent process
         // Close the write end of pipes
         if (close(stdout_pipe[1]) == -1 || close(stderr_pipe[1]) == -1) {
             throw std::runtime_error("Error closing pipe.");
         }
 
-        // Read the solver's stdout
-        std::string output;
-        char buffer[100]; // Read 100 bytes at a time
-        while (true) {
-            ssize_t bytes = read(stdout_pipe[0], buffer, sizeof(buffer));
-            if (bytes <= 0) break;
-            output.append((char *) buffer, bytes);
-        }
-        close(stdout_pipe[0]);
+        std::string stdout;
+        std::string stderr;
 
-        // Read the solver's stderr
-        std::string error;
-        while (true) {
-            ssize_t bytes = read(stderr_pipe[0], buffer, sizeof(buffer));
-            if (bytes <= 0) break;
-            error.append((char *) buffer, bytes);
-        }
-        close(stderr_pipe[0]);
+        // Create a thread for each data stream to prevent deadlocks
+        std::thread t1(readFromPipe, stdout_pipe[0], std::ref(stdout));
+        std::thread t2(readFromPipe, stderr_pipe[0], std::ref(stderr));
+        t1.join();
+        t2.join();
 
         // Check that the child process has successfully finished
         int status;
@@ -79,16 +84,14 @@ vnnlib::solver::ProcessResult vnnlib::solver::runProcess(
         }
 
         // Set the fields of the result object
-        result.stdoutText = output;
-        result.stderrText = error;
+        result.stdoutText = stdout;
+        result.stderrText = stderr;
 
         // Check if the program exited normally
         if (WIFEXITED(status)) {
             result.exitedNormally = true;
-        } else {
-            result.exitedNormally = false;
+            result.exitCode = WEXITSTATUS(status);
         }
-        result.exitCode = WEXITSTATUS(status);
     }
 
     return result;

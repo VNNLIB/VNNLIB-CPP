@@ -289,3 +289,28 @@ if(MAKE_JULIA)
     
     message(STATUS "Julia wrapper library will be built as `VNNLibJulia`")
 endif()
+
+# ------------------------------------------------------------
+# Tests
+# ------------------------------------------------------------
+
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    include(CTest)
+
+    if(BUILD_TESTING)
+        add_executable(VerifyTestSolver
+            tests/VerifyTestSolver.cpp
+        )
+
+        add_executable(SolverVerifyTests
+            tests/SolverVerifyTests.cpp
+        )
+
+        target_link_libraries(SolverVerifyTests PRIVATE VNNLib)
+
+        add_test(
+            NAME SolverVerifyTests
+            COMMAND SolverVerifyTests $<TARGET_FILE:VerifyTestSolver>
+        )
+    endif()
+endif()

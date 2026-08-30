@@ -25,7 +25,8 @@ vnnlib::solver::ProcessResult vnnlib::solver::runProcess(
     // Create the pipes for communication between the processes
     int stdout_pipe[2];
     int stderr_pipe[2];
-    if (pipe(stdout_pipe) == -1 || pipe(stderr_pipe) == -1) {
+    int error_pipe[2];
+    if (pipe(stdout_pipe) == -1 || pipe(stderr_pipe) == -1 || pipe(error_pipe) == -1) {
         throw std::runtime_error("Error creating pipe.");
     }
 
@@ -36,12 +37,11 @@ vnnlib::solver::ProcessResult vnnlib::solver::runProcess(
     // Create a fork of the current process
     pid_t pid = fork();
 
-    int error;
     if (pid < 0) {
         throw std::runtime_error("Error forking process.");
     } else if (pid == 0) { // Child process
         // Close the read end of pipes
-        if (close(stdout_pipe[0]) == -1 || close(stderr_pipe[0]) == -1) {
+        if (close(stdout_pipe[0]) == -1 || close(stderr_pipe[0]) == -1 || close(error_pipe[0]) == -1) {
             throw std::runtime_error("Error closing pipe.");
         }
 
@@ -62,17 +62,19 @@ vnnlib::solver::ProcessResult vnnlib::solver::runProcess(
         args.push_back(nullptr);
 
         execvp(args[0], args.data());
-        error = errno;
+
+        // If the execvp call fails, write errno to the pipe for the parent to interpret
+        write(error_pipe[1], &errno, sizeof(int));
+        _exit(1);
     } else { // Parent process
         // Close the write end of pipes
-        if (close(stdout_pipe[1]) == -1 || close(stderr_pipe[1]) == -1) {
+        if (close(stdout_pipe[1]) == -1 || close(stderr_pipe[1]) == -1 || close(error_pipe[1]) == -1) {
             throw std::runtime_error("Error closing pipe.");
         }
 
+        // Create a thread for each data stream to prevent deadlocks
         std::string stdoutText;
         std::string stderrText;
-
-        // Create a thread for each data stream to prevent deadlocks
         std::thread t1(readFromPipe, stdout_pipe[0], std::ref(stdoutText));
         std::thread t2(readFromPipe, stderr_pipe[0], std::ref(stderrText));
         t1.join();
@@ -84,12 +86,16 @@ vnnlib::solver::ProcessResult vnnlib::solver::runProcess(
             throw std::runtime_error("Error waiting for solver " + executable + " to finish.");
         }
 
+        // Read the error code from the error pipe
+        int error = 0;
+        read(error_pipe[0], &error, sizeof(int));
+
         // Set the fields of the result object
         result.stdoutText = stdoutText;
         result.stderrText = stderrText;
 
         // Check if the program exited normally
-        if (error != 0 && WIFEXITED(status)) {
+        if (error == 0 && WIFEXITED(status)) {
             result.exitedNormally = true;
             result.exitCode = WEXITSTATUS(status);
         }

@@ -16,6 +16,8 @@
 #include "json.hpp"
 #include "TypedAST.h"
 
+namespace vnnlib::query {
+
 
 class TypeChecker; // Forward declaration
 
@@ -216,3 +218,5 @@ private:
     std::unordered_map<std::string, NetworkInfo> networks;
     std::string currentNetworkName;
 };
+
+} // namespace vnnlib::query

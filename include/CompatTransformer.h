@@ -12,6 +12,7 @@
 #include "Error.hpp"
 #include "VNNLibExport.h"
 
+namespace vnnlib::query {
 
 // Represents a linear inequality of the form: coeffs * x <= rhs
 struct VNNLIB_API Polytope {
@@ -59,3 +60,5 @@ private:
     void parseLiteral(const TCompare* node, Box& inputBounds, Polytope& outputConstraints);
     void enumerateCases();
 };
+
+} // namespace vnnlib::query

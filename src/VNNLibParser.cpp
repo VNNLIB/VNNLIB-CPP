@@ -13,7 +13,6 @@
 #include <iostream>
 
 #include "CLI11.hpp"
-
 #include "VNNLib.h"
 #include "TypedBuilder.h"
 #include "Parser.H"
@@ -21,6 +20,7 @@
 #include "Absyn.H"
 #include "Printer.H"
 
+using namespace vnnlib::query;
 
 using file_ptr = std::unique_ptr<FILE, int(*)(FILE*)>;
 

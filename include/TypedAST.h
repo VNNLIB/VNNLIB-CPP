@@ -13,6 +13,7 @@
 #include "Printer.H"
 #include "VNNLibExport.h"
 
+namespace vnnlib::query {
 
 using Shape = std::vector<int64_t>;
 using Indices = std::vector<int64_t>;
@@ -28,10 +29,10 @@ enum class TDataType {
 	FloatConstant, NegativeIntConstant, PositiveIntConstant
 };
 
-std::string dtypeToString(TDataType dt);
-bool isConstant(TDataType dt);
-bool sameFamily(TDataType varDt, TDataType constDt);
-bool sameType(TDataType a, TDataType b);
+VNNLIB_API std::string dtypeToString(TDataType dt);
+VNNLIB_API bool isConstant(TDataType dt);
+VNNLIB_API bool sameFamily(TDataType varDt, TDataType constDt);
+VNNLIB_API bool sameType(TDataType a, TDataType b);
 
 // Structure to store symbol information
 enum class SymbolKind {Input, Hidden, Output, Network, Unknown};
@@ -265,11 +266,4 @@ protected:
 	Query* src_Query{nullptr};
 };
 
-
-
-
-
-
-
-
-
+} // namespace vnnlib::query

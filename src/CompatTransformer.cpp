@@ -1,11 +1,12 @@
 #include "CompatTransformer.h"
 
+namespace vnnlib::query {
 
 // --- Forward declarations ---
 
-static vnnlib::query::LinearArithExpr combineExprs(const TCompare* node);
+static LinearArithExpr combineExprs(const TCompare* node);
 static void refineBounds(Box& box, int index, double coeff, double rhs);
-static void refineConstraints(Polytope& polytope, int outputSize, const vnnlib::query::LinearArithExpr& expr);
+static void refineConstraints(Polytope& polytope, int outputSize, const LinearArithExpr& expr);
 static std::string boxSignature(const Box& box);
 static bool boxIsUnsat(const Box& box);
 static int64_t flattenIndex(const std::vector<int64_t>& shape);
@@ -129,7 +130,7 @@ void CompatTransformer::enumerateCases() {
 }
 
 void CompatTransformer::parseLiteral(const TCompare* node, Box& inputBounds, Polytope& outputConstraints) {
-    vnnlib::query::LinearArithExpr linearExpr = combineExprs(node);
+    LinearArithExpr linearExpr = combineExprs(node);
     const auto& terms = linearExpr.getTerms();
     double constant = linearExpr.getConstant();
 
@@ -197,13 +198,13 @@ static std::string caseToString(const SpecCase& c) {
 
 // --- Helper methods ---
 
-static vnnlib::query::LinearArithExpr combineExprs(const TCompare* node) {
+static LinearArithExpr combineExprs(const TCompare* node) {
     // Move all terms to the left-hand side
-    std::unique_ptr<vnnlib::query::LinearArithExpr> linearLHS;
-    std::unique_ptr<vnnlib::query::LinearArithExpr> linearRHS;
+    std::unique_ptr<LinearArithExpr> linearLHS;
+    std::unique_ptr<LinearArithExpr> linearRHS;
     try {
-        linearLHS = vnnlib::query::linearize(node->lhs.get());
-        linearRHS = vnnlib::query::linearize(node->rhs.get());
+        linearLHS = linearize(node->lhs.get());
+        linearRHS = linearize(node->rhs.get());
     } catch (const VNNLibException& e) {
         throw VNNLibException(std::string("CompatTransformer: Non-linear expression encountered: ") + e.what());
     }
@@ -231,7 +232,7 @@ static void refineBounds(Box& box, int index, double coeff, double rhs) {
     }
 }
 
-static void refineConstraints(Polytope& polytope, int outputSize, const vnnlib::query::LinearArithExpr & expr) {
+static void refineConstraints(Polytope& polytope, int outputSize, const LinearArithExpr& expr) {
     double rhs = -expr.getConstant();
     auto terms = expr.getTerms();
 
@@ -298,6 +299,8 @@ static std::string boxSignature(const Box &box) {
     }
     return s;
 }
+
+} // namespace vnnlib::query
 
 
 

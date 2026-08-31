@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(VNNLib LANGUAGES CXX)
 
+include(CTest)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -286,4 +288,15 @@ if(MAKE_JULIA)
     add_dependencies(VNNLibJulia BNFCGen ParserGen VNNLib)
     
     message(STATUS "Julia wrapper library will be built as `VNNLibJulia`")
+endif()
+
+# ------------------------------------------------------------
+# Tests
+# ------------------------------------------------------------
+
+if(BUILD_TESTING)
+    add_executable(QueryNamespaceTest tests/QueryNamespaceTest.cpp)
+    target_link_libraries(QueryNamespaceTest PRIVATE VNNLib)
+    add_test(NAME QueryNamespaceTest COMMAND QueryNamespaceTest)
+
 endif()

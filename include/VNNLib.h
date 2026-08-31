@@ -17,8 +17,11 @@
 
 #include "Error.hpp"
 
+namespace vnnlib::query {
+
 VNNLIB_API std::unique_ptr<TQuery> parseQueryFile(std::string path);
 VNNLIB_API std::unique_ptr<TQuery> parseQueryString(std::string content);
 VNNLIB_API std::string checkQueryFile(std::string path);
 VNNLIB_API std::string checkQueryString(std::string content);
 
+} // namespace vnnlib::query

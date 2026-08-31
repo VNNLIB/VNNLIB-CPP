@@ -1,5 +1,7 @@
 #include "TypeChecker.h"
 
+namespace vnnlib::query {
+
 // --- Utility methods ---
 
 // Map ElementType to DType
@@ -905,3 +907,5 @@ void TypeChecker::visitListNumber(ListNumber *p) {
 void TypeChecker::visitNumber(Number *p) {}                 // Token for number literals
 
 void TypeChecker::visitVersionToken(VersionToken *x) {}     // Token for version
+
+} // namespace vnnlib::query

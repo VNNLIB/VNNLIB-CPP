@@ -1,5 +1,7 @@
 #include "VNNLib.h"
 
+namespace vnnlib::query {
+
 std::unique_ptr<TQuery> parseQueryFile(std::string path) {
     FILE *file = fopen(path.c_str(), "r");
     if (!file) {
@@ -103,5 +105,7 @@ std::string checkQueryString(std::string content) {
     }
     return "";
 }
+
+} // namespace vnnlib::query
 
 

@@ -13,6 +13,8 @@
 #include "Absyn.H"
 #include "VNNLibExport.h"
 
+namespace vnnlib::query {
+
 using Literal = const TCompare*;                // A Boolean literal is a comparison (e.g., x <= 5)
 using Clause = std::vector<Literal>;            // A clause is a conjunction of literals 
 using DNF    = std::vector<Clause>;             // DNF is a disjunction of clauses
@@ -23,4 +25,4 @@ DNF dnfOr(const std::vector<std::unique_ptr<TBoolExpr>>& args);
 DNF dnfAnd(const std::vector<std::unique_ptr<TBoolExpr>>& args);
 DNF distrib(const DNF& left, const DNF& right);
 
-
+} // namespace vnnlib::query

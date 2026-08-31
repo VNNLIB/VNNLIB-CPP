@@ -1,5 +1,7 @@
 #include "TypedBuilder.h"
 
+namespace vnnlib::query {
+
 // --- Utility Functions ---
 
 template <class T>
@@ -474,3 +476,5 @@ void TypedBuilder::visitNumber(Number *p) {
 void TypedBuilder::visitVersionToken(VersionToken *p) {
     TypeChecker::visitVersionToken(p);
 }
+
+} // namespace vnnlib::query

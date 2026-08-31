@@ -1,6 +1,8 @@
 #include "DNFConverter.h"
 #include <stdexcept>
 
+namespace vnnlib::query {
+
 // root-level function to perform DNF conversion
 DNF toDNF(const TBoolExpr* node) {
     return dnfOf(node); 
@@ -58,3 +60,5 @@ DNF distrib(const DNF& left, const DNF& right) {
     }
     return out;
 }
+
+} // namespace vnnlib::query

@@ -5,6 +5,8 @@
 
 #include "VNNLibExport.h"
 
+namespace vnnlib::query {
+
 class VNNLIB_API VNNLibException : public std::exception {
 private:
     std::string message_;
@@ -14,3 +16,5 @@ public:
         return message_.c_str();
     }
 };
+
+} // namespace vnnlib::query

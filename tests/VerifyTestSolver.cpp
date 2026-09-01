@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <cstdlib>
+
 
 int main(int argc, char* argv[]) {
     if (argc < 3 || std::string(argv[1]) != "verify") {
@@ -47,6 +49,11 @@ int main(int argc, char* argv[]) {
     if (query == "nonzero.vnnlib") {
         std::cout << "sat\n";
         return 7;
+    }
+
+    if (query == "crash.vnnlib") {
+        std::cout << "sat\n" << std::flush;
+        std::abort();
     }
 
     if (query == "arguments.vnnlib") {

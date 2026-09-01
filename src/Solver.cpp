@@ -299,6 +299,7 @@ Solver::Solver(const std::string& executable)
     : executable_(executable) {
 }
 
+
 VerificationResult Solver::verify(
     const std::string& query,
     const std::unordered_map<std::string, std::string>& networks,
@@ -308,6 +309,10 @@ VerificationResult Solver::verify(
         buildVerifyArguments(query, networks, timeout);
 
     ProcessResult result = runProcess(executable_, arguments);
+
+    if (!result.exitedNormally) {
+        throw VNNLibException("Solver process terminated abnormally");
+    }
 
     return parseVerificationResult(result.stdoutText);
 }
@@ -319,7 +324,10 @@ SupportResult Solver::supports(Capability capability)
 
     ProcessResult result = runProcess(executable_, arguments);
 
+    if (!result.exitedNormally) {
+        throw VNNLibException("Solver process terminated abnormally");
+    }
+
     return parseSupportResult(capability, result.stdoutText);
 }
-
 }

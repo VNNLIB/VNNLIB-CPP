@@ -135,6 +135,20 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+
+    bool crashThrown = false;
+
+    try {
+        edgeSolver.supports(Capability::SerialiseAssignments);
+    } catch (const VNNLibException&) {
+        crashThrown = true;
+    }
+
+    if (!crashThrown) {
+        std::cerr << "Abnormal supports termination did not throw VNNLibException\n";
+        return 1;
+    }
+
     std::cout << "Solver supports tests passed\n";
     return 0;
 }

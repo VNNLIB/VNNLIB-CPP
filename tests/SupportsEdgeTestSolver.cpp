@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <cstdlib>
+
 
 int main(int argc, char* argv[]) {
     if (argc != 3 || std::string(argv[1]) != "supports") {
@@ -22,6 +24,12 @@ int main(int argc, char* argv[]) {
     if (capability == "--optimised-disjunctive-reasoning") {
         std::cout << "true\n";
         return 7;
+    }
+
+
+    if (capability == "--serialise-assignments") {
+        std::cout << "false\n" << std::flush;
+        std::abort();
     }
 
     return 1;

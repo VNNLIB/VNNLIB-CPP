@@ -56,6 +56,19 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    bool crashThrown = false;
+
+    try {
+        solver.verify("crash.vnnlib", {});
+    } catch (const VNNLibException&) {
+        crashThrown = true;
+    }
+
+    if (!crashThrown) {
+        std::cerr << "Abnormal solver termination did not throw VNNLibException\n";
+        return 1;
+    }
+
     std::unordered_map<std::string, std::string> networks = {
         {"N", "model.onnx"}
     };

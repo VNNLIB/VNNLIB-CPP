@@ -306,11 +306,31 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
             tests/SolverVerifyTests.cpp
         )
 
+        add_executable(SupportsTestSolver
+            tests/SupportsTestSolver.cpp
+        )
+
+        add_executable(SupportsEdgeTestSolver
+            tests/SupportsEdgeTestSolver.cpp
+        )
+
+        add_executable(SolverSupportsTests
+            tests/SolverSupportsTests.cpp
+        )
+
         target_link_libraries(SolverVerifyTests PRIVATE VNNLib)
+        target_link_libraries(SolverSupportsTests PRIVATE VNNLib)
 
         add_test(
             NAME SolverVerifyTests
             COMMAND SolverVerifyTests $<TARGET_FILE:VerifyTestSolver>
+        )
+
+        add_test(
+            NAME SolverSupportsTests
+            COMMAND SolverSupportsTests
+                $<TARGET_FILE:SupportsTestSolver>
+                $<TARGET_FILE:SupportsEdgeTestSolver>
         )
     endif()
 endif()

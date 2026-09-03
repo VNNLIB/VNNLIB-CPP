@@ -149,6 +149,21 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    Solver missingSolver("definitely-not-a-real-vnnlib-solver");
+
+    bool missingThrown = false;
+
+    try {
+        missingSolver.supports(Capability::OnnxOpsetVersions);
+    } catch (const VNNLibException&) {
+        missingThrown = true;
+    }
+
+    if (!missingThrown) {
+        std::cerr << "Missing solver executable did not throw VNNLibException\n";
+        return 1;
+    }
+
     std::cout << "Solver supports tests passed\n";
     return 0;
 }

@@ -1,4 +1,5 @@
 // C++ wrapper for VNNLib using CxxWrap
+#define VNNLIB_NO_DEPRECATED_QUERY_API
 #include <jlcxx/jlcxx.hpp>
 #include <jlcxx/stl.hpp>
 #include <vector>

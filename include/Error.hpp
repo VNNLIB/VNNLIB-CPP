@@ -18,3 +18,8 @@ public:
 };
 
 } // namespace vnnlib::query
+
+#ifndef VNNLIB_NO_DEPRECATED_QUERY_API
+using VNNLibException [[deprecated("use vnnlib::query::VNNLibException")]] =
+    vnnlib::query::VNNLibException;
+#endif

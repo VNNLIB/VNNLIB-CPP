@@ -299,4 +299,8 @@ if(BUILD_TESTING)
     target_link_libraries(QueryNamespaceTest PRIVATE VNNLib)
     add_test(NAME QueryNamespaceTest COMMAND QueryNamespaceTest)
 
+    add_executable(QueryCompatibilityTest tests/QueryCompatibilityTest.cpp)
+    target_link_libraries(QueryCompatibilityTest PRIVATE VNNLib)
+    add_test(NAME QueryCompatibilityTest COMMAND QueryCompatibilityTest)
+
 endif()

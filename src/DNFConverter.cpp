@@ -1,3 +1,4 @@
+#define VNNLIB_NO_DEPRECATED_QUERY_API
 #include "DNFConverter.h"
 #include <stdexcept>
 
@@ -62,3 +63,7 @@ DNF distrib(const DNF& left, const DNF& right) {
 }
 
 } // namespace vnnlib::query
+
+VNNLIB_API vnnlib::query::DNF toDNF(const vnnlib::query::TBoolExpr* node) {
+    return vnnlib::query::toDNF(node);
+}

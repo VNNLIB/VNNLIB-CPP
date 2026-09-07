@@ -267,3 +267,46 @@ protected:
 };
 
 } // namespace vnnlib::query
+
+#ifndef VNNLIB_NO_DEPRECATED_QUERY_API
+// Deprecated global aliases preserve source compatibility with the pre-namespace API.
+using Shape [[deprecated("use vnnlib::query::Shape")]] = vnnlib::query::Shape;
+using Indices [[deprecated("use vnnlib::query::Indices")]] = vnnlib::query::Indices;
+using TDataType [[deprecated("use vnnlib::query::TDataType")]] = vnnlib::query::TDataType;
+using SymbolKind [[deprecated("use vnnlib::query::SymbolKind")]] = vnnlib::query::SymbolKind;
+using SymbolInfo [[deprecated("use vnnlib::query::SymbolInfo")]] = vnnlib::query::SymbolInfo;
+using TNode [[deprecated("use vnnlib::query::TNode")]] = vnnlib::query::TNode;
+using TElementType [[deprecated("use vnnlib::query::TElementType")]] = vnnlib::query::TElementType;
+using TArithExpr [[deprecated("use vnnlib::query::TArithExpr")]] = vnnlib::query::TArithExpr;
+using TVarExpr [[deprecated("use vnnlib::query::TVarExpr")]] = vnnlib::query::TVarExpr;
+using TLiteral [[deprecated("use vnnlib::query::TLiteral")]] = vnnlib::query::TLiteral;
+using TFloat [[deprecated("use vnnlib::query::TFloat")]] = vnnlib::query::TFloat;
+using TInt [[deprecated("use vnnlib::query::TInt")]] = vnnlib::query::TInt;
+using TNegate [[deprecated("use vnnlib::query::TNegate")]] = vnnlib::query::TNegate;
+using TPlus [[deprecated("use vnnlib::query::TPlus")]] = vnnlib::query::TPlus;
+using TMinus [[deprecated("use vnnlib::query::TMinus")]] = vnnlib::query::TMinus;
+using TMultiply [[deprecated("use vnnlib::query::TMultiply")]] = vnnlib::query::TMultiply;
+using TBoolExpr [[deprecated("use vnnlib::query::TBoolExpr")]] = vnnlib::query::TBoolExpr;
+using TCompare [[deprecated("use vnnlib::query::TCompare")]] = vnnlib::query::TCompare;
+using TGreaterThan [[deprecated("use vnnlib::query::TGreaterThan")]] = vnnlib::query::TGreaterThan;
+using TLessThan [[deprecated("use vnnlib::query::TLessThan")]] = vnnlib::query::TLessThan;
+using TGreaterEqual [[deprecated("use vnnlib::query::TGreaterEqual")]] = vnnlib::query::TGreaterEqual;
+using TLessEqual [[deprecated("use vnnlib::query::TLessEqual")]] = vnnlib::query::TLessEqual;
+using TEqual [[deprecated("use vnnlib::query::TEqual")]] = vnnlib::query::TEqual;
+using TNotEqual [[deprecated("use vnnlib::query::TNotEqual")]] = vnnlib::query::TNotEqual;
+using TConnective [[deprecated("use vnnlib::query::TConnective")]] = vnnlib::query::TConnective;
+using TAnd [[deprecated("use vnnlib::query::TAnd")]] = vnnlib::query::TAnd;
+using TOr [[deprecated("use vnnlib::query::TOr")]] = vnnlib::query::TOr;
+using TAssertion [[deprecated("use vnnlib::query::TAssertion")]] = vnnlib::query::TAssertion;
+using TInputDefinition [[deprecated("use vnnlib::query::TInputDefinition")]] = vnnlib::query::TInputDefinition;
+using THiddenDefinition [[deprecated("use vnnlib::query::THiddenDefinition")]] = vnnlib::query::THiddenDefinition;
+using TOutputDefinition [[deprecated("use vnnlib::query::TOutputDefinition")]] = vnnlib::query::TOutputDefinition;
+using TNetworkDefinition [[deprecated("use vnnlib::query::TNetworkDefinition")]] = vnnlib::query::TNetworkDefinition;
+using TVersion [[deprecated("use vnnlib::query::TVersion")]] = vnnlib::query::TVersion;
+using TQuery [[deprecated("use vnnlib::query::TQuery")]] = vnnlib::query::TQuery;
+
+using vnnlib::query::dtypeToString;
+using vnnlib::query::isConstant;
+using vnnlib::query::sameFamily;
+using vnnlib::query::sameType;
+#endif

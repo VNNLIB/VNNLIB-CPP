@@ -1,3 +1,4 @@
+#define VNNLIB_NO_DEPRECATED_QUERY_API
 #include "TypeChecker.h"
 
 namespace vnnlib::query {

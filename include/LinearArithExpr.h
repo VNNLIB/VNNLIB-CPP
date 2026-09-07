@@ -86,3 +86,10 @@ public:
 VNNLIB_API std::unique_ptr<LinearArithExpr> linearize(const TArithExpr* arithExpr);
 
 } // namespace vnnlib::query
+
+#ifndef VNNLIB_NO_DEPRECATED_QUERY_API
+using LinearArithExpr [[deprecated("use vnnlib::query::LinearArithExpr")]] =
+    vnnlib::query::LinearArithExpr;
+
+using vnnlib::query::linearize;
+#endif

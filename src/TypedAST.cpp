@@ -1,3 +1,4 @@
+#define VNNLIB_NO_DEPRECATED_QUERY_API
 #include "TypedAST.h"  
 
 namespace vnnlib::query {

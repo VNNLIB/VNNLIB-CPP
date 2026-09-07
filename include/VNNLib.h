@@ -25,3 +25,14 @@ VNNLIB_API std::string checkQueryFile(std::string path);
 VNNLIB_API std::string checkQueryString(std::string content);
 
 } // namespace vnnlib::query
+
+#ifndef VNNLIB_NO_DEPRECATED_QUERY_API
+[[deprecated("use vnnlib::query::parseQueryFile")]]
+VNNLIB_API std::unique_ptr<vnnlib::query::TQuery> parseQueryFile(std::string path);
+[[deprecated("use vnnlib::query::parseQueryString")]]
+VNNLIB_API std::unique_ptr<vnnlib::query::TQuery> parseQueryString(std::string content);
+[[deprecated("use vnnlib::query::checkQueryFile")]]
+VNNLIB_API std::string checkQueryFile(std::string path);
+[[deprecated("use vnnlib::query::checkQueryString")]]
+VNNLIB_API std::string checkQueryString(std::string content);
+#endif

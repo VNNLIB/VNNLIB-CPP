@@ -2,10 +2,8 @@
 #include "Solver.h"
 #include <iostream>
 #include <string>
-#include <variant>
 #include <vector>
 
-using vnnlib::solver::Capability;
 using vnnlib::solver::OperatorSupport;
 using vnnlib::solver::Solver;
 using vnnlib::solver::VersionRange;
@@ -18,8 +16,7 @@ int main(int argc, char* argv[]) {
 
     Solver solver(argv[1]);
 
-    VersionRange opset = std::get<VersionRange>(
-        solver.supports(Capability::OnnxOpsetVersions));
+    VersionRange opset = solver.supportsOnnxOpsetVersions();
 
     if (opset.minimum != "13" || opset.maximum != "21") {
         std::cerr << "Unexpected ONNX opset versions\n";
@@ -27,8 +24,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::vector<std::string> elementTypes =
-        std::get<std::vector<std::string>>(
-            solver.supports(Capability::OnnxElementTypes));
+        solver.supportsOnnxElementTypes();
 
     if (elementTypes !=
         std::vector<std::string>{"real", "float32", "float64"}) {
@@ -37,8 +33,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::vector<OperatorSupport> operators =
-        std::get<std::vector<OperatorSupport>>(
-            solver.supports(Capability::OnnxOperators));
+        solver.supportsOnnxOperators();
 
     if (operators.size() != 2 ||
         operators[0].name != "Gemm" ||
@@ -50,57 +45,49 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    VersionRange versions = std::get<VersionRange>(
-        solver.supports(Capability::VNNLibVersions));
+    VersionRange versions = solver.supportsVNNLibVersions();
 
     if (versions.minimum != "2.0" || versions.maximum != "2.0") {
         std::cerr << "Unexpected VNN-LIB versions\n";
         return 1;
     }
 
-    if (std::get<std::vector<std::string>>(
-            solver.supports(Capability::HiddenNodeTheories)) !=
+    if (solver.supportsHiddenNodeTheories() !=
         std::vector<std::string>{"NH", "H"}) {
         std::cerr << "Unexpected hidden node theories\n";
         return 1;
     }
 
-    if (std::get<std::vector<std::string>>(
-            solver.supports(Capability::MultipleInputOutputTheories)) !=
+    if (solver.supportsMultipleInputOutputTheories() !=
         std::vector<std::string>{"SIO", "MIO"}) {
         std::cerr << "Unexpected input/output theories\n";
         return 1;
     }
 
-    if (std::get<std::vector<std::string>>(
-            solver.supports(Capability::MultipleNetworkTheories)) !=
+    if (solver.supportsMultipleNetworkTheories() !=
         std::vector<std::string>{"SNET", "MNET", "MENET", "MINET"}) {
         std::cerr << "Unexpected network theories\n";
         return 1;
     }
 
-    if (std::get<std::vector<std::string>>(
-            solver.supports(Capability::MultipleNodeComparisonTheories)) !=
+    if (solver.supportsMultipleNodeComparisonTheories() !=
         std::vector<std::string>{"SNC", "MNC"}) {
         std::cerr << "Unexpected comparison theories\n";
         return 1;
     }
 
-    if (std::get<std::vector<std::string>>(
-            solver.supports(Capability::ArithmeticComplexityTheories)) !=
+    if (solver.supportsArithmeticComplexityTheories() !=
         std::vector<std::string>{"BND", "OUTC", "LIN", "POLY"}) {
         std::cerr << "Unexpected arithmetic theories\n";
         return 1;
     }
 
-    if (!std::get<bool>(
-            solver.supports(Capability::OptimisedDisjunctiveReasoning))) {
+    if (!solver.supportsOptimisedDisjunctiveReasoning()) {
         std::cerr << "Unexpected disjunctive reasoning support\n";
         return 1;
     }
 
-    if (std::get<bool>(
-            solver.supports(Capability::SerialiseAssignments))) {
+    if (solver.supportsSerialiseAssignments()) {
         std::cerr << "Unexpected assignment support\n";
         return 1;
     }
@@ -110,7 +97,7 @@ int main(int argc, char* argv[]) {
     bool malformedThrown = false;
 
     try {
-        edgeSolver.supports(Capability::OnnxOpsetVersions);
+        edgeSolver.supportsOnnxOpsetVersions();
     } catch (const VNNLibException&) {
         malformedThrown = true;
     }
@@ -121,16 +108,14 @@ int main(int argc, char* argv[]) {
     }
 
     std::vector<std::string> stderrResult =
-        std::get<std::vector<std::string>>(
-            edgeSolver.supports(Capability::OnnxElementTypes));
+        edgeSolver.supportsOnnxElementTypes();
 
     if (stderrResult != std::vector<std::string>{"real", "float32"}) {
         std::cerr << "stderr affected supports result\n";
         return 1;
     }
 
-    if (!std::get<bool>(
-            edgeSolver.supports(Capability::OptimisedDisjunctiveReasoning))) {
+    if (!edgeSolver.supportsOptimisedDisjunctiveReasoning()) {
         std::cerr << "Non-zero exit affected valid supports result\n";
         return 1;
     }
@@ -139,7 +124,7 @@ int main(int argc, char* argv[]) {
     bool crashThrown = false;
 
     try {
-        edgeSolver.supports(Capability::SerialiseAssignments);
+        edgeSolver.supportsSerialiseAssignments();
     } catch (const VNNLibException&) {
         crashThrown = true;
     }
@@ -154,7 +139,7 @@ int main(int argc, char* argv[]) {
     bool missingThrown = false;
 
     try {
-        missingSolver.supports(Capability::OnnxOpsetVersions);
+        missingSolver.supportsOnnxOpsetVersions();
     } catch (const VNNLibException&) {
         missingThrown = true;
     }

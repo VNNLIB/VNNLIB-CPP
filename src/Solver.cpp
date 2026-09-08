@@ -36,54 +36,10 @@ std::vector<std::string> buildVerifyArguments(
 
 //Build supports command args
 std::vector<std::string> buildSupportsArguments(
-    vnnlib::solver::Capability capability)
+    const std::string& capability)
 {
-    using vnnlib::solver::Capability;
-
-    std::string argument;
-
-    switch (capability) {
-        case Capability::OnnxOpsetVersions:
-            argument = "--onnx-opset-versions";
-            break;
-        case Capability::OnnxElementTypes:
-            argument = "--onnx-element-types";
-            break;
-        case Capability::OnnxOperators:
-            argument = "--onnx-operators";
-            break;
-        case Capability::VNNLibVersions:
-            argument = "--vnnlib-versions";
-            break;
-        case Capability::HiddenNodeTheories:
-            argument = "--hidden-node-theories";
-            break;
-        case Capability::MultipleInputOutputTheories:
-            argument = "--multiple-input-output-theories";
-            break;
-        case Capability::MultipleNetworkTheories:
-            argument = "--multiple-network-theories";
-            break;
-        case Capability::MultipleNodeComparisonTheories:
-            argument = "--multiple-node-comparison-theories";
-            break;
-        case Capability::ArithmeticComplexityTheories:
-            argument = "--arithmetic-complexity-theories";
-            break;
-        case Capability::OptimisedDisjunctiveReasoning:
-            argument = "--optimised-disjunctive-reasoning";
-            break;
-        case Capability::SerialiseAssignments:
-            argument = "--serialise-assignments";
-            break;
-        default:
-            throw VNNLibException("Unknown solver capability");
-    }
-
-    return {"supports", argument};
+    return {"supports", capability};
 }
-
-
 
 
 //Split output into lines
@@ -213,53 +169,23 @@ std::vector<std::string> parseTheoryList(
 
 
 
-//Parse supports result
-vnnlib::solver::SupportResult parseSupportResult(
-    vnnlib::solver::Capability capability,
-    const std::string& output)
+//Run supports command
+std::string runSupports(
+    const std::string& executable,
+    const std::string& capability)
 {
-    using vnnlib::solver::Capability;
+    std::vector<std::string> arguments =
+        buildSupportsArguments(capability);
 
-    switch (capability) {
-        case Capability::OnnxOpsetVersions:
-        case Capability::VNNLibVersions:
-            return parseVersionRange(output);
+    vnnlib::solver::ProcessResult result =
+        vnnlib::solver::runProcess(executable, arguments);
 
-        case Capability::OnnxElementTypes:
-            return parseSupportList(output);
-
-        case Capability::OnnxOperators:
-            return parseOperatorSupport(output);
-
-        case Capability::HiddenNodeTheories:
-            return parseTheoryList(output, {"NH", "H"});
-
-        case Capability::MultipleInputOutputTheories:
-            return parseTheoryList(output, {"SIO", "MIO"});
-
-        case Capability::MultipleNetworkTheories:
-            return parseTheoryList(
-                output,
-                {"SNET", "MNET", "MENET", "MINET"});
-
-        case Capability::MultipleNodeComparisonTheories:
-            return parseTheoryList(output, {"SNC", "MNC"});
-
-        case Capability::ArithmeticComplexityTheories:
-            return parseTheoryList(
-                output,
-                {"BND", "OUTC", "LIN", "POLY"});
-
-        case Capability::OptimisedDisjunctiveReasoning:
-        case Capability::SerialiseAssignments:
-            return parseSupportBoolean(output);
-
-        default:
-            throw VNNLibException("Unknown solver capability");
+    if (!result.exitedNormally) {
+        throw VNNLibException("Solver process terminated abnormally");
     }
+
+    return result.stdoutText;
 }
-
-
 
 
 //Read verify result
@@ -317,17 +243,74 @@ VerificationResult Solver::verify(
     return parseVerificationResult(result.stdoutText);
 }
 
-SupportResult Solver::supports(Capability capability)
+VersionRange Solver::supportsOnnxOpsetVersions()
 {
-    std::vector<std::string> arguments =
-        buildSupportsArguments(capability);
+    return parseVersionRange(
+        runSupports(executable_, "--onnx-opset-versions"));
+}
 
-    ProcessResult result = runProcess(executable_, arguments);
+std::vector<std::string> Solver::supportsOnnxElementTypes()
+{
+    return parseSupportList(
+        runSupports(executable_, "--onnx-element-types"));
+}
 
-    if (!result.exitedNormally) {
-        throw VNNLibException("Solver process terminated abnormally");
-    }
+std::vector<OperatorSupport> Solver::supportsOnnxOperators()
+{
+    return parseOperatorSupport(
+        runSupports(executable_, "--onnx-operators"));
+}
 
-    return parseSupportResult(capability, result.stdoutText);
+VersionRange Solver::supportsVNNLibVersions()
+{
+    return parseVersionRange(
+        runSupports(executable_, "--vnnlib-versions"));
+}
+
+std::vector<std::string> Solver::supportsHiddenNodeTheories()
+{
+    return parseTheoryList(
+        runSupports(executable_, "--hidden-node-theories"),
+        {"NH", "H"});
+}
+
+std::vector<std::string> Solver::supportsMultipleInputOutputTheories()
+{
+    return parseTheoryList(
+        runSupports(executable_, "--multiple-input-output-theories"),
+        {"SIO", "MIO"});
+}
+
+std::vector<std::string> Solver::supportsMultipleNetworkTheories()
+{
+    return parseTheoryList(
+        runSupports(executable_, "--multiple-network-theories"),
+        {"SNET", "MNET", "MENET", "MINET"});
+}
+
+std::vector<std::string> Solver::supportsMultipleNodeComparisonTheories()
+{
+    return parseTheoryList(
+        runSupports(executable_, "--multiple-node-comparison-theories"),
+        {"SNC", "MNC"});
+}
+
+std::vector<std::string> Solver::supportsArithmeticComplexityTheories()
+{
+    return parseTheoryList(
+        runSupports(executable_, "--arithmetic-complexity-theories"),
+        {"BND", "OUTC", "LIN", "POLY"});
+}
+
+bool Solver::supportsOptimisedDisjunctiveReasoning()
+{
+    return parseSupportBoolean(
+        runSupports(executable_, "--optimised-disjunctive-reasoning"));
+}
+
+bool Solver::supportsSerialiseAssignments()
+{
+    return parseSupportBoolean(
+        runSupports(executable_, "--serialise-assignments"));
 }
 }

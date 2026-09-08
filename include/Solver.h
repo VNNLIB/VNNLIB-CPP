@@ -3,7 +3,6 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
-#include <variant>
 #include <vector>
 #include "VNNLibExport.h"
 
@@ -17,20 +16,6 @@ enum class VerificationResult {
     TimedOut
 };
 
-enum class Capability {
-    OnnxOpsetVersions,
-    OnnxElementTypes,
-    OnnxOperators,
-    VNNLibVersions,
-    HiddenNodeTheories,
-    MultipleInputOutputTheories,
-    MultipleNetworkTheories,
-    MultipleNodeComparisonTheories,
-    ArithmeticComplexityTheories,
-    OptimisedDisjunctiveReasoning,
-    SerialiseAssignments
-};
-
 struct VNNLIB_API VersionRange {
     std::string minimum;
     std::string maximum;
@@ -41,14 +26,6 @@ struct VNNLIB_API OperatorSupport {
     std::string name;
     std::vector<std::string> elementTypes;
 };
-
-using SupportResult = std::variant<
-    VersionRange,
-    std::vector<std::string>,
-    std::vector<OperatorSupport>,
-    bool
->;
-
 
 
 class VNNLIB_API Solver {
@@ -63,7 +40,17 @@ class VNNLIB_API Solver {
     const std::unordered_map<std::string, std::string>& networks,
     std::optional<int> timeout = std::nullopt);
 
-    SupportResult supports(Capability capability);
+    VersionRange supportsOnnxOpsetVersions();
+    std::vector<std::string> supportsOnnxElementTypes();
+    std::vector<OperatorSupport> supportsOnnxOperators();
+    VersionRange supportsVNNLibVersions();
+    std::vector<std::string> supportsHiddenNodeTheories();
+    std::vector<std::string> supportsMultipleInputOutputTheories();
+    std::vector<std::string> supportsMultipleNetworkTheories();
+    std::vector<std::string> supportsMultipleNodeComparisonTheories();
+    std::vector<std::string> supportsArithmeticComplexityTheories();
+    bool supportsOptimisedDisjunctiveReasoning();
+    bool supportsSerialiseAssignments();
 
 };
 

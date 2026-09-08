@@ -1,4 +1,7 @@
+#define VNNLIB_NO_DEPRECATED_QUERY_API
 #include "TypedBuilder.h"
+
+namespace vnnlib::query {
 
 // --- Utility Functions ---
 
@@ -474,3 +477,5 @@ void TypedBuilder::visitNumber(Number *p) {
 void TypedBuilder::visitVersionToken(VersionToken *p) {
     TypeChecker::visitVersionToken(p);
 }
+
+} // namespace vnnlib::query

@@ -1,5 +1,7 @@
 #include "VNNLib.h"
 
+namespace vnnlib::query {
+
 std::unique_ptr<TQuery> parseQueryFile(std::string path) {
     FILE *file = fopen(path.c_str(), "r");
     if (!file) {
@@ -102,6 +104,24 @@ std::string checkQueryString(std::string content) {
         return typeChecker.getErrorReport();
     }
     return "";
+}
+
+} // namespace vnnlib::query
+
+std::unique_ptr<vnnlib::query::TQuery> parseQueryFile(std::string path) {
+    return vnnlib::query::parseQueryFile(std::move(path));
+}
+
+std::unique_ptr<vnnlib::query::TQuery> parseQueryString(std::string content) {
+    return vnnlib::query::parseQueryString(std::move(content));
+}
+
+std::string checkQueryFile(std::string path) {
+    return vnnlib::query::checkQueryFile(std::move(path));
+}
+
+std::string checkQueryString(std::string content) {
+    return vnnlib::query::checkQueryString(std::move(content));
 }
 
 

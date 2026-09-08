@@ -1,3 +1,7 @@
+# Unreleased (up to 2026-09-08)
+
+* Moved the C++ Query API into the `vnnlib::query` namespace. Existing global names remain available for backwards compatibility and are marked `[[deprecated]]`.
+
 # Version 1.1
 
 * Added support for VNNLIB 2.0:

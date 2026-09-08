@@ -5,6 +5,8 @@
 
 #include "VNNLibExport.h"
 
+namespace vnnlib::query {
+
 class VNNLIB_API VNNLibException : public std::exception {
 private:
     std::string message_;
@@ -14,3 +16,10 @@ public:
         return message_.c_str();
     }
 };
+
+} // namespace vnnlib::query
+
+#ifndef VNNLIB_NO_DEPRECATED_QUERY_API
+using VNNLibException [[deprecated("use vnnlib::query::VNNLibException")]] =
+    vnnlib::query::VNNLibException;
+#endif

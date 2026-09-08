@@ -11,6 +11,7 @@
 #include "Error.hpp"
 #include "VNNLibExport.h"
 
+namespace vnnlib::query {
 /**
  * @brief Represents a linear arithmetic expression of the form:
  *        c0 + c1*x1 + c2*x2 + ... + cn*xn
@@ -83,3 +84,12 @@ public:
  * @throws VNNLibException if the expression is non-linear.
  */
 VNNLIB_API std::unique_ptr<LinearArithExpr> linearize(const TArithExpr* arithExpr);
+
+} // namespace vnnlib::query
+
+#ifndef VNNLIB_NO_DEPRECATED_QUERY_API
+using LinearArithExpr [[deprecated("use vnnlib::query::LinearArithExpr")]] =
+    vnnlib::query::LinearArithExpr;
+
+using vnnlib::query::linearize;
+#endif

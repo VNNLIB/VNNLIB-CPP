@@ -1,4 +1,5 @@
 // VNNLibParser_CLI11.cpp
+#define VNNLIB_NO_DEPRECATED_QUERY_API
 // C++ port of the provided C/argp CLI to CLI11 with the same behavior.
 // Subcommands:
 //   check [-v|--verbose] [-j|--json] [-o|--output FILE] VNNLIBFILE
@@ -13,7 +14,6 @@
 #include <iostream>
 
 #include "CLI11.hpp"
-
 #include "VNNLib.h"
 #include "TypedBuilder.h"
 #include "Parser.H"
@@ -21,6 +21,7 @@
 #include "Absyn.H"
 #include "Printer.H"
 
+using namespace vnnlib::query;
 
 using file_ptr = std::unique_ptr<FILE, int(*)(FILE*)>;
 

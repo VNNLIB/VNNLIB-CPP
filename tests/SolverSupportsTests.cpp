@@ -5,6 +5,7 @@
 #include <vector>
 
 using vnnlib::solver::OperatorSupport;
+using vnnlib::solver::OpsetRange;
 using vnnlib::solver::Solver;
 using vnnlib::solver::VersionRange;
 
@@ -16,9 +17,9 @@ int main(int argc, char* argv[]) {
 
     Solver solver(argv[1]);
 
-    VersionRange opset = solver.supportsOnnxOpsetVersions();
+    OpsetRange opset = solver.supportsOnnxOpsetVersions();
 
-    if (opset.minimum != "13" || opset.maximum != "21") {
+    if (opset.minimum != 13 || opset.maximum != 21) {
         std::cerr << "Unexpected ONNX opset versions\n";
         return 1;
     }
@@ -47,7 +48,14 @@ int main(int argc, char* argv[]) {
 
     VersionRange versions = solver.supportsVNNLibVersions();
 
-    if (versions.minimum != "2.0" || versions.maximum != "2.0") {
+    if (versions.minimum.major != 2 ||
+        versions.minimum.minor != 0 ||
+        versions.minimum.patch.has_value() ||
+        !versions.minimum.extra.empty() ||
+        versions.maximum.major != 2 ||
+        versions.maximum.minor != 3 ||
+        versions.maximum.patch != 1 ||
+        versions.maximum.extra != "-beta") {
         std::cerr << "Unexpected VNN-LIB versions\n";
         return 1;
     }

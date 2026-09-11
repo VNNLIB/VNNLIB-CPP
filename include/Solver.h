@@ -16,9 +16,21 @@ enum class VerificationResult {
     TimedOut
 };
 
+struct VNNLIB_API SemanticVersion {
+    int major;
+    int minor;
+    std::optional<int> patch;
+    std::string extra;
+};
+
 struct VNNLIB_API VersionRange {
-    std::string minimum;
-    std::string maximum;
+    SemanticVersion minimum;
+    SemanticVersion maximum;
+};
+
+struct VNNLIB_API OpsetRange {
+    int minimum;
+    int maximum;
 };
 
 // empty element types means all reported types
@@ -40,7 +52,7 @@ class VNNLIB_API Solver {
     const std::unordered_map<std::string, std::string>& networks,
     std::optional<int> timeout = std::nullopt);
 
-    VersionRange supportsOnnxOpsetVersions();
+    OpsetRange supportsOnnxOpsetVersions();
     std::vector<std::string> supportsOnnxElementTypes();
     std::vector<OperatorSupport> supportsOnnxOperators();
     VersionRange supportsVNNLibVersions();

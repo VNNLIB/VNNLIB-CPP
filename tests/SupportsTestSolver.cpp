@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
     } else if (capability == "--onnx-operators") {
         std::cout << "Gemm float32 float64\nRelu\n";
     } else if (capability == "--vnnlib-versions") {
-        std::cout << "2.0\n2.0\n";
+        std::cout << "2.0\n2.3.1-beta\n";
     } else if (capability == "--hidden-node-theories") {
         std::cout << "NH\nH\n";
     } else if (capability == "--multiple-input-output-theories") {

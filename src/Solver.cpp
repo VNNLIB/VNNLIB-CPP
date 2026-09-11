@@ -62,6 +62,92 @@ std::vector<std::string> splitLines(const std::string& output)
 
 
 
+//Parse integer
+int parseInteger(
+    const std::string& value,
+    const std::string& errorMessage)
+{
+    if (value.empty()) {
+        throw VNNLibException(errorMessage);
+    }
+
+    for (char character : value) {
+        if (character < '0' || character > '9') {
+            throw VNNLibException(errorMessage);
+        }
+    }
+
+    try {
+        return std::stoi(value);
+    } catch (...) {
+        throw VNNLibException(errorMessage);
+    }
+}
+
+//Parse semantic version
+vnnlib::solver::SemanticVersion parseSemanticVersion(
+    const std::string& value)
+{
+    const std::string errorMessage = "Malformed version range output";
+
+    size_t firstDot = value.find('.');
+
+    if (firstDot == std::string::npos) {
+        throw VNNLibException(errorMessage);
+    }
+
+    std::string majorText = value.substr(0, firstDot);
+
+    size_t minorStart = firstDot + 1;
+    size_t minorEnd = minorStart;
+
+    while (minorEnd < value.size() &&
+           value[minorEnd] >= '0' &&
+           value[minorEnd] <= '9') {
+        minorEnd++;
+    }
+
+    if (minorEnd == minorStart) {
+        throw VNNLibException(errorMessage);
+    }
+
+    std::string minorText =
+        value.substr(minorStart, minorEnd - minorStart);
+
+    std::optional<int> patch = std::nullopt;
+    std::string extra;
+
+    if (minorEnd < value.size() && value[minorEnd] == '.') {
+        size_t patchStart = minorEnd + 1;
+        size_t patchEnd = patchStart;
+
+        while (patchEnd < value.size() &&
+               value[patchEnd] >= '0' &&
+               value[patchEnd] <= '9') {
+            patchEnd++;
+        }
+
+        if (patchEnd == patchStart) {
+            throw VNNLibException(errorMessage);
+        }
+
+        patch = parseInteger(
+            value.substr(patchStart, patchEnd - patchStart),
+            errorMessage);
+
+        extra = value.substr(patchEnd);
+    } else {
+        extra = value.substr(minorEnd);
+    }
+
+    return {
+        parseInteger(majorText, errorMessage),
+        parseInteger(minorText, errorMessage),
+        patch,
+        extra
+    };
+}
+
 //Parse version range
 vnnlib::solver::VersionRange parseVersionRange(
     const std::string& output)
@@ -72,7 +158,26 @@ vnnlib::solver::VersionRange parseVersionRange(
         throw VNNLibException("Malformed version range output");
     }
 
-    return {lines[0], lines[1]};
+    return {
+        parseSemanticVersion(lines[0]),
+        parseSemanticVersion(lines[1])
+    };
+}
+
+//Parse ONNX opset range
+vnnlib::solver::OpsetRange parseOpsetRange(
+    const std::string& output)
+{
+    std::vector<std::string> lines = splitLines(output);
+
+    if (lines.size() != 2 || lines[0].empty() || lines[1].empty()) {
+        throw VNNLibException("Malformed opset range output");
+    }
+
+    return {
+        parseInteger(lines[0], "Malformed opset range output"),
+        parseInteger(lines[1], "Malformed opset range output")
+    };
 }
 
 
@@ -243,9 +348,9 @@ VerificationResult Solver::verify(
     return parseVerificationResult(result.stdoutText);
 }
 
-VersionRange Solver::supportsOnnxOpsetVersions()
+OpsetRange Solver::supportsOnnxOpsetVersions()
 {
-    return parseVersionRange(
+    return parseOpsetRange(
         runSupports(executable_, "--onnx-opset-versions"));
 }
 

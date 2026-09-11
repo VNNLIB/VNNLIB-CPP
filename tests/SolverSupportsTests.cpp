@@ -24,11 +24,14 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::vector<std::string> elementTypes =
+    std::vector<TDataType> elementTypes =
         solver.supportsOnnxElementTypes();
 
     if (elementTypes !=
-        std::vector<std::string>{"real", "float32", "float64"}) {
+        std::vector<TDataType>{
+            TDataType::Real,
+            TDataType::F32,
+            TDataType::F64}) {
         std::cerr << "Unexpected ONNX element types\n";
         return 1;
     }
@@ -39,7 +42,9 @@ int main(int argc, char* argv[]) {
     if (operators.size() != 2 ||
         operators[0].name != "Gemm" ||
         operators[0].elementTypes !=
-            std::vector<std::string>{"float32", "float64"} ||
+            std::vector<TDataType>{
+                TDataType::F32,
+                TDataType::F64} ||
         operators[1].name != "Relu" ||
         !operators[1].elementTypes.empty()) {
         std::cerr << "Unexpected ONNX operators\n";
@@ -115,16 +120,31 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::vector<std::string> stderrResult =
+    std::vector<TDataType> stderrResult =
         edgeSolver.supportsOnnxElementTypes();
 
-    if (stderrResult != std::vector<std::string>{"real", "float32"}) {
+    if (stderrResult !=
+        std::vector<TDataType>{TDataType::Real, TDataType::F32}) {
         std::cerr << "stderr affected supports result\n";
         return 1;
     }
 
     if (!edgeSolver.supportsOptimisedDisjunctiveReasoning()) {
         std::cerr << "Non-zero exit affected valid supports result\n";
+        return 1;
+    }
+
+
+    bool elementTypeThrown = false;
+
+    try {
+        edgeSolver.supportsOnnxOperators();
+    } catch (const VNNLibException&) {
+        elementTypeThrown = true;
+    }
+
+    if (!elementTypeThrown) {
+        std::cerr << "Unknown element type did not throw VNNLibException\n";
         return 1;
     }
 

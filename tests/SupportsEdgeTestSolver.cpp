@@ -21,6 +21,11 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
+    if (capability == "--onnx-operators") {
+        std::cout << "Gemm unknown-type\n";
+        return 0;
+    }
+
     if (capability == "--optimised-disjunctive-reasoning") {
         std::cout << "true\n";
         return 7;

@@ -200,6 +200,49 @@ std::vector<std::string> parseSupportList(
 
 
 
+//Parse element type
+TDataType parseElementType(const std::string& value)
+{
+    if (value == "real") return TDataType::Real;
+    if (value == "float16") return TDataType::F16;
+    if (value == "float32") return TDataType::F32;
+    if (value == "float64") return TDataType::F64;
+    if (value == "bfloat16") return TDataType::BF16;
+    if (value == "float8e4m3fn") return TDataType::F8E4M3FN;
+    if (value == "float8e5m2") return TDataType::F8E5M2;
+    if (value == "float8e4m3fnuz") return TDataType::F8E4M3FNUZ;
+    if (value == "float8e5m2fnuz") return TDataType::F8E5M2FNUZ;
+    if (value == "float4e2m1") return TDataType::F4E2M1;
+    if (value == "int8") return TDataType::I8;
+    if (value == "int16") return TDataType::I16;
+    if (value == "int32") return TDataType::I32;
+    if (value == "int64") return TDataType::I64;
+    if (value == "uint8") return TDataType::U8;
+    if (value == "uint16") return TDataType::U16;
+    if (value == "uint32") return TDataType::U32;
+    if (value == "uint64") return TDataType::U64;
+    if (value == "complex64") return TDataType::C64;
+    if (value == "complex128") return TDataType::C128;
+    if (value == "bool") return TDataType::Bool;
+
+    throw VNNLibException("Malformed element type support output");
+}
+
+//Parse element type list
+std::vector<TDataType> parseElementTypes(
+    const std::string& output)
+{
+    std::vector<std::string> values = parseSupportList(output);
+    std::vector<TDataType> elementTypes;
+
+    for (const std::string& value : values) {
+        elementTypes.push_back(parseElementType(value));
+    }
+
+    return elementTypes;
+}
+
+
 //Parse boolean output
 bool parseSupportBoolean(const std::string& output)
 {
@@ -245,7 +288,8 @@ std::vector<vnnlib::solver::OperatorSupport> parseOperatorSupport(
         std::string elementType;
 
         while (stream >> elementType) {
-            operatorSupport.elementTypes.push_back(elementType);
+            operatorSupport.elementTypes.push_back(
+                parseElementType(elementType));
         }
 
         operators.push_back(operatorSupport);
@@ -354,9 +398,9 @@ OpsetRange Solver::supportsOnnxOpsetVersions()
         runSupports(executable_, "--onnx-opset-versions"));
 }
 
-std::vector<std::string> Solver::supportsOnnxElementTypes()
+std::vector<TDataType> Solver::supportsOnnxElementTypes()
 {
-    return parseSupportList(
+    return parseElementTypes(
         runSupports(executable_, "--onnx-element-types"));
 }
 

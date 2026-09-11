@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "TypedAST.h"
 #include "VNNLibExport.h"
 
 
@@ -36,7 +37,7 @@ struct VNNLIB_API OpsetRange {
 // empty element types means all reported types
 struct VNNLIB_API OperatorSupport {
     std::string name;
-    std::vector<std::string> elementTypes;
+    std::vector<TDataType> elementTypes;
 };
 
 
@@ -53,7 +54,7 @@ class VNNLIB_API Solver {
     std::optional<int> timeout = std::nullopt);
 
     OpsetRange supportsOnnxOpsetVersions();
-    std::vector<std::string> supportsOnnxElementTypes();
+    std::vector<TDataType> supportsOnnxElementTypes();
     std::vector<OperatorSupport> supportsOnnxOperators();
     VersionRange supportsVNNLibVersions();
     std::vector<std::string> supportsHiddenNodeTheories();

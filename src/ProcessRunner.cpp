@@ -35,7 +35,7 @@ using namespace vnnlib::solver;
         HANDLE stdout_write = NULL;
         HANDLE stderr_read = NULL;
         HANDLE stderr_write = NULL;
-        if (!CreatePipe(&stdout_read, &stdout_write, &sa, 0) || CreatePipe(&stderr_read, &stderr_write, &sa, 0)) {
+        if (!CreatePipe(&stdout_read, &stdout_write, &sa, 0) || !CreatePipe(&stderr_read, &stderr_write, &sa, 0)) {
             throw std::runtime_error("Error creating pipe.");
         }
 
@@ -49,20 +49,21 @@ using namespace vnnlib::solver;
         result.exitedNormally = false;
 
         // Create a string for the command line arguments
-        std::string args;
+        std::string args = executable;
         for (const auto& argument : arguments) {
-            args += " "; 
+            args += " ";
             args += argument.c_str();
         }
 
         // Create the child process
-        PROCESS_INFORMATION pi;
-        STARTUPINFO si;
+        PROCESS_INFORMATION pi{};
+        STARTUPINFO si{};
+        si.cb = sizeof(STARTUPINFO);
         si.hStdError = stderr_write;
         si.hStdOutput = stdout_write;
         si.dwFlags |= STARTF_USESTDHANDLES;
         BOOL success = CreateProcess(
-            executable.c_str(),
+            NULL,
             args.data(),
             NULL,
             NULL,
@@ -75,8 +76,9 @@ using namespace vnnlib::solver;
         );
 
         // Ensure the process was successfully executed
+        int error = 0;
         if (!success) {
-            throw std::runtime_error("Error running process.");
+            error = 1;
         }
 
         // Close the write handles from the parent
@@ -98,10 +100,14 @@ using namespace vnnlib::solver;
 
         // Check if the program exited normally
         DWORD exitCode = 0;
-        if (GetExitCodeProcess(pi.hProcess, &exitCode)) {
+        if (error == 0 && GetExitCodeProcess(pi.hProcess, &exitCode)) {
             result.exitedNormally = true;
             result.exitCode = exitCode;
         }
+
+        // Close the process handles
+        CloseHandle(pi.hThread);
+        CloseHandle(pi.hProcess);
 
         return result;
     }

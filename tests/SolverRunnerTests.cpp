@@ -1,6 +1,13 @@
 #include "Error.hpp"
 #include "ProcessRunner.h"
 #include <iostream>
+#include <optional>
+
+#ifdef _WIN32
+    const std::string newline = "\r\n";
+#else
+    const std::string newline = "\n";
+#endif
 
 using namespace vnnlib::solver;
 
@@ -42,14 +49,14 @@ int main(int argc, char *argv[]) {
     if (!checkResult("", "", std::nullopt, false)) return 1;
 
     res = vnnlib::solver::runProcess(process, {});
-    if (!checkResult("", "Usage: " + process + " <exit_code>\n", 1, true)) return 1;
+    if (!checkResult("", "Usage: " + process + " <exit_code>" + newline, 1, true)) return 1;
 
     res = vnnlib::solver::runProcess(process, {"invalidargument"});
-    if (!checkResult("This is a test process\n", "This is some error text", 1, true)) return 1;
+    if (!checkResult("This is a test process" + newline, "This is some error text", 1, true)) return 1;
 
     res = vnnlib::solver::runProcess(process, {"2", "these", "are", "arguments"});
-    if (!checkResult("This is a test processthese are arguments \n", "This is some error text", 2, true)) return 1;
+    if (!checkResult("This is a test processthese are arguments " + newline, "This is some error text", 2, true)) return 1;
 
     res = vnnlib::solver::runProcess(process, {"100", "these", "are", "arguments"});
-    if (!checkResult("This is a test processthese are arguments \n", "This is some error text", 100, true)) return 1;
+    if (!checkResult("This is a test processthese are arguments " + newline, "This is some error text", 100, true)) return 1;
 }

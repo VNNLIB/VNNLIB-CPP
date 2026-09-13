@@ -5,7 +5,7 @@
 using namespace vnnlib::solver;
 
 #ifdef _WIN32
-#include <windows.h>
+    #include <windows.h>
 
     namespace {
         void readFromPipe(HANDLE source, std::string& out) {

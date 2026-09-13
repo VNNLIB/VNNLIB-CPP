@@ -288,3 +288,27 @@ if(MAKE_JULIA)
     
     message(STATUS "Julia wrapper library will be built as `VNNLibJulia`")
 endif()
+
+# ------------------------------------------------------------
+# Tests
+# ------------------------------------------------------------
+
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    include(CTest)
+
+    if(BUILD_TESTING)
+        add_executable(SolverRunnerTests
+            tests/SolverRunnerTests.cpp
+            src/ProcessRunner.cpp
+        )
+
+        add_executable(MockProcess
+            tests/MockProcess.cpp
+        )
+
+        add_test(
+            NAME SolverRunnerTests
+            COMMAND SolverRunnerTests $<TARGET_FILE:MockProcess>
+        )
+    endif()
+endif()

@@ -332,5 +332,19 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
                 $<TARGET_FILE:SupportsTestSolver>
                 $<TARGET_FILE:SupportsEdgeTestSolver>
         )
+
+        add_executable(SolverRunnerTests
+            tests/SolverRunnerTests.cpp
+            src/ProcessRunner.cpp
+        )
+
+        add_executable(MockProcess
+            tests/MockProcess.cpp
+        )
+
+        add_test(
+            NAME SolverRunnerTests
+            COMMAND SolverRunnerTests $<TARGET_FILE:MockProcess>
+        )
     endif()
 endif()

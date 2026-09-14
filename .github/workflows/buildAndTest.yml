@@ -37,6 +37,9 @@ jobs:
                 done
                 echo "All tests passed"
 
+            - name: Test Solver interface
+              run: ctest --test-dir build --output-on-failure
+
     build-and-test-windows:
         runs-on: windows-latest
         steps:
@@ -62,6 +65,9 @@ jobs:
                   ../bin/Release/VNNLibParser.exe check $file.FullName
                 }
                 Write-Host "All tests passed"
+            
+            - name: Test Solver interface
+              run: ctest --test-dir build -C Release --output-on-failure
 
     build-and-test-macos:
         runs-on: macos-latest
@@ -88,6 +94,9 @@ jobs:
                   ../bin/VNNLibParser check "$file"
                 done
                 echo "All tests passed"
+
+            - name: Test Solver interface
+              run: ctest --test-dir build -C Release --output-on-failure
 
     build-and-test-from-grammar:
         runs-on: ubuntu-latest

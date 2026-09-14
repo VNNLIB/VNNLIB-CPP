@@ -52,7 +52,16 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if (!checkResult(solver, "nonzero.vnnlib", VerificationResult::Sat)) {
+    bool nonzeroThrown = false;
+
+    try {
+        solver.verify("nonzero.vnnlib", {});
+    } catch (const VNNLibException&) {
+        nonzeroThrown = true;
+    }
+
+    if (!nonzeroThrown) {
+        std::cerr << "Non-zero solver exit did not throw VNNLibException\n";
         return 1;
     }
 

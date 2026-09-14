@@ -329,8 +329,8 @@ std::string runSupports(
     vnnlib::solver::ProcessResult result =
         vnnlib::solver::runProcess(executable, arguments);
 
-    if (!result.exitedNormally) {
-        throw VNNLibException("Solver process terminated abnormally");
+    if (!result.exitedNormally || !result.exitCode.has_value() || result.exitCode.value() != 0) {
+        throw VNNLibException("Solver process failed");
     }
 
     return result.stdoutText;
@@ -385,8 +385,8 @@ VerificationResult Solver::verify(
 
     ProcessResult result = runProcess(executable_, arguments);
 
-    if (!result.exitedNormally) {
-        throw VNNLibException("Solver process terminated abnormally");
+    if (!result.exitedNormally || !result.exitCode.has_value() || result.exitCode.value() != 0) {
+        throw VNNLibException("Solver process failed");
     }
 
     return parseVerificationResult(result.stdoutText);

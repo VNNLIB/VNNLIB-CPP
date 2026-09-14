@@ -129,8 +129,16 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if (!edgeSolver.supportsOptimisedDisjunctiveReasoning()) {
-        std::cerr << "Non-zero exit affected valid supports result\n";
+    bool nonzeroThrown = false;
+
+    try {
+        edgeSolver.supportsOptimisedDisjunctiveReasoning();
+    } catch (const VNNLibException&) {
+        nonzeroThrown = true;
+    }
+
+    if (!nonzeroThrown) {
+        std::cerr << "Non-zero supports exit did not throw VNNLibException\n";
         return 1;
     }
 

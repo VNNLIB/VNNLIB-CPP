@@ -12,6 +12,7 @@
 #include "Error.hpp"
 #include "VNNLibExport.h"
 
+namespace vnnlib::query {
 
 // Represents a linear inequality of the form: coeffs * x <= rhs
 struct VNNLIB_API Polytope {
@@ -59,3 +60,14 @@ private:
     void parseLiteral(const TCompare* node, Box& inputBounds, Polytope& outputConstraints);
     void enumerateCases();
 };
+
+} // namespace vnnlib::query
+
+#ifndef VNNLIB_NO_DEPRECATED_QUERY_API
+using Polytope [[deprecated("use vnnlib::query::Polytope")]] = vnnlib::query::Polytope;
+using Box [[deprecated("use vnnlib::query::Box")]] = vnnlib::query::Box;
+using PolyUnion [[deprecated("use vnnlib::query::PolyUnion")]] = vnnlib::query::PolyUnion;
+using SpecCase [[deprecated("use vnnlib::query::SpecCase")]] = vnnlib::query::SpecCase;
+using CompatTransformer [[deprecated("use vnnlib::query::CompatTransformer")]] =
+    vnnlib::query::CompatTransformer;
+#endif

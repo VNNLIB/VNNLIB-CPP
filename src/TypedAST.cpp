@@ -1,4 +1,7 @@
+#define VNNLIB_NO_DEPRECATED_QUERY_API
 #include "TypedAST.h"  
+
+namespace vnnlib::query {
 
 // ----------- Utility Functions ----------
 
@@ -223,6 +226,8 @@ void TQuery::children(std::vector<const TNode*>& out) const {
 std::string TQuery::toString() const {
     return bnfcPrint(src_Query);
 }
+
+} // namespace vnnlib::query
 
 
 

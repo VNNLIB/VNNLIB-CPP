@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(VNNLib LANGUAGES CXX)
 
+include(CTest)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -297,6 +299,16 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     include(CTest)
 
     if(BUILD_TESTING)
+        # Query namespace tests
+        add_executable(QueryNamespaceTest tests/QueryNamespaceTest.cpp)
+        target_link_libraries(QueryNamespaceTest PRIVATE VNNLib)
+        add_test(NAME QueryNamespaceTest COMMAND QueryNamespaceTest)
+
+        add_executable(QueryCompatibilityTest tests/QueryCompatibilityTest.cpp)
+        target_link_libraries(QueryCompatibilityTest PRIVATE VNNLib)
+        add_test(NAME QueryCompatibilityTest COMMAND QueryCompatibilityTest)
+
+        # Solver process runner tests
         add_executable(SolverRunnerTests
             tests/SolverRunnerTests.cpp
             src/ProcessRunner.cpp

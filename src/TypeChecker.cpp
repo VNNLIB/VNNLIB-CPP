@@ -1,4 +1,7 @@
+#define VNNLIB_NO_DEPRECATED_QUERY_API
 #include "TypeChecker.h"
+
+namespace vnnlib::query {
 
 // --- Utility methods ---
 
@@ -905,3 +908,5 @@ void TypeChecker::visitListNumber(ListNumber *p) {
 void TypeChecker::visitNumber(Number *p) {}                 // Token for number literals
 
 void TypeChecker::visitVersionToken(VersionToken *x) {}     // Token for version
+
+} // namespace vnnlib::query

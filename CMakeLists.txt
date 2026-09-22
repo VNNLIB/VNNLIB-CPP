@@ -153,6 +153,7 @@ set(MAIN_SRCS
     ${SRC_DIR}/LinearArithExpr.cpp
     ${SRC_DIR}/CompatTransformer.cpp
     ${SRC_DIR}/DNFConverter.cpp
+    ${SRC_DIR}/ProcessRunner.cpp
 )
 
 set(PARSER_MAIN
@@ -286,4 +287,28 @@ if(MAKE_JULIA)
     add_dependencies(VNNLibJulia BNFCGen ParserGen VNNLib)
     
     message(STATUS "Julia wrapper library will be built as `VNNLibJulia`")
+endif()
+
+# ------------------------------------------------------------
+# Tests
+# ------------------------------------------------------------
+
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    include(CTest)
+
+    if(BUILD_TESTING)
+        add_executable(SolverRunnerTests
+            tests/SolverRunnerTests.cpp
+            src/ProcessRunner.cpp
+        )
+
+        add_executable(MockProcess
+            tests/MockProcess.cpp
+        )
+
+        add_test(
+            NAME SolverRunnerTests
+            COMMAND SolverRunnerTests $<TARGET_FILE:MockProcess>
+        )
+    endif()
 endif()

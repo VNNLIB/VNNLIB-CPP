@@ -66,7 +66,7 @@ struct VNNLIB_API OpsetRange {
 // empty element types means all reported types
 struct VNNLIB_API OperatorSupport {
     std::string name;
-    std::vector<TDataType> elementTypes;
+    std::vector<vnnlib::query::TDataType> elementTypes;
 };
 
 
@@ -83,7 +83,7 @@ class VNNLIB_API Solver {
     std::optional<int> timeout = std::nullopt);
 
     OpsetRange supportsOnnxOpsetVersions();
-    std::vector<TDataType> supportsOnnxElementTypes();
+    std::vector<vnnlib::query::TDataType> supportsOnnxElementTypes();
     std::vector<OperatorSupport> supportsOnnxOperators();
     VersionRange supportsVNNLibVersions();
     std::vector<HiddenNodeTheory> supportsHiddenNodeTheories();

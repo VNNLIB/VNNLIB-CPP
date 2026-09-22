@@ -1,5 +1,7 @@
+#define VNNLIB_NO_DEPRECATED_QUERY_API
 #include "CompatTransformer.h"
 
+namespace vnnlib::query {
 
 // --- Forward declarations ---
 
@@ -298,6 +300,8 @@ static std::string boxSignature(const Box &box) {
     }
     return s;
 }
+
+} // namespace vnnlib::query
 
 
 

@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
 
     try {
         solver.verify("nonzero.vnnlib", {});
-    } catch (const VNNLibException&) {
+    } catch (const vnnlib::query::VNNLibException&) {
         nonzeroThrown = true;
     }
 
@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
 
     try {
         solver.verify("crash.vnnlib", {});
-    } catch (const VNNLibException&) {
+    } catch (const vnnlib::query::VNNLibException&) {
         crashThrown = true;
     }
 
@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
 
     try {
         missingSolver.verify("query.vnnlib", {});
-    } catch (const VNNLibException&) {
+    } catch (const vnnlib::query::VNNLibException&) {
         missingThrown = true;
     }
 
@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
 
     try {
         solver.verify("malformed.vnnlib", {});
-    } catch (const VNNLibException&) {
+    } catch (const vnnlib::query::VNNLibException&) {
         malformedThrown = true;
     }
 

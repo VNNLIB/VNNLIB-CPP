@@ -24,14 +24,14 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::vector<TDataType> elementTypes =
+    std::vector<vnnlib::query::TDataType> elementTypes =
         solver.supportsOnnxElementTypes();
 
     if (elementTypes !=
-        std::vector<TDataType>{
-            TDataType::Real,
-            TDataType::F32,
-            TDataType::F64}) {
+        std::vector<vnnlib::query::TDataType>{
+            vnnlib::query::TDataType::Real,
+            vnnlib::query::TDataType::F32,
+            vnnlib::query::TDataType::F64}) {
         std::cerr << "Unexpected ONNX element types\n";
         return 1;
     }
@@ -42,9 +42,9 @@ int main(int argc, char* argv[]) {
     if (operators.size() != 2 ||
         operators[0].name != "Gemm" ||
         operators[0].elementTypes !=
-            std::vector<TDataType>{
-                TDataType::F32,
-                TDataType::F64} ||
+            std::vector<vnnlib::query::TDataType>{
+                vnnlib::query::TDataType::F32,
+                vnnlib::query::TDataType::F64} ||
         operators[1].name != "Relu" ||
         !operators[1].elementTypes.empty()) {
         std::cerr << "Unexpected ONNX operators\n";
@@ -125,7 +125,7 @@ int main(int argc, char* argv[]) {
 
     try {
         edgeSolver.supportsOnnxOpsetVersions();
-    } catch (const VNNLibException&) {
+    } catch (const vnnlib::query::VNNLibException&) {
         malformedThrown = true;
     }
 
@@ -134,11 +134,11 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::vector<TDataType> stderrResult =
+    std::vector<vnnlib::query::TDataType> stderrResult =
         edgeSolver.supportsOnnxElementTypes();
 
     if (stderrResult !=
-        std::vector<TDataType>{TDataType::Real, TDataType::F32}) {
+        std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::Real, vnnlib::query::TDataType::F32}) {
         std::cerr << "stderr affected supports result\n";
         return 1;
     }
@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) {
 
     try {
         edgeSolver.supportsOptimisedDisjunctiveReasoning();
-    } catch (const VNNLibException&) {
+    } catch (const vnnlib::query::VNNLibException&) {
         nonzeroThrown = true;
     }
 
@@ -161,7 +161,7 @@ int main(int argc, char* argv[]) {
 
     try {
         edgeSolver.supportsOnnxOperators();
-    } catch (const VNNLibException&) {
+    } catch (const vnnlib::query::VNNLibException&) {
         elementTypeThrown = true;
     }
 
@@ -175,7 +175,7 @@ int main(int argc, char* argv[]) {
 
     try {
         edgeSolver.supportsSerialiseAssignments();
-    } catch (const VNNLibException&) {
+    } catch (const vnnlib::query::VNNLibException&) {
         crashThrown = true;
     }
 
@@ -190,7 +190,7 @@ int main(int argc, char* argv[]) {
 
     try {
         missingSolver.supportsOnnxOpsetVersions();
-    } catch (const VNNLibException&) {
+    } catch (const vnnlib::query::VNNLibException&) {
         missingThrown = true;
     }
 

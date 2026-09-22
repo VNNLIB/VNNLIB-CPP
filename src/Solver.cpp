@@ -68,19 +68,19 @@ int parseInteger(
     const std::string& errorMessage)
 {
     if (value.empty()) {
-        throw VNNLibException(errorMessage);
+        throw vnnlib::query::VNNLibException(errorMessage);
     }
 
     for (char character : value) {
         if (character < '0' || character > '9') {
-            throw VNNLibException(errorMessage);
+            throw vnnlib::query::VNNLibException(errorMessage);
         }
     }
 
     try {
         return std::stoi(value);
     } catch (...) {
-        throw VNNLibException(errorMessage);
+        throw vnnlib::query::VNNLibException(errorMessage);
     }
 }
 
@@ -93,7 +93,7 @@ vnnlib::solver::SemanticVersion parseSemanticVersion(
     size_t firstDot = value.find('.');
 
     if (firstDot == std::string::npos) {
-        throw VNNLibException(errorMessage);
+        throw vnnlib::query::VNNLibException(errorMessage);
     }
 
     std::string majorText = value.substr(0, firstDot);
@@ -108,7 +108,7 @@ vnnlib::solver::SemanticVersion parseSemanticVersion(
     }
 
     if (minorEnd == minorStart) {
-        throw VNNLibException(errorMessage);
+        throw vnnlib::query::VNNLibException(errorMessage);
     }
 
     std::string minorText =
@@ -128,7 +128,7 @@ vnnlib::solver::SemanticVersion parseSemanticVersion(
         }
 
         if (patchEnd == patchStart) {
-            throw VNNLibException(errorMessage);
+            throw vnnlib::query::VNNLibException(errorMessage);
         }
 
         patch = parseInteger(
@@ -155,7 +155,7 @@ vnnlib::solver::VersionRange parseVersionRange(
     std::vector<std::string> lines = splitLines(output);
 
     if (lines.size() != 2 || lines[0].empty() || lines[1].empty()) {
-        throw VNNLibException("Malformed version range output");
+        throw vnnlib::query::VNNLibException("Malformed version range output");
     }
 
     return {
@@ -171,7 +171,7 @@ vnnlib::solver::OpsetRange parseOpsetRange(
     std::vector<std::string> lines = splitLines(output);
 
     if (lines.size() != 2 || lines[0].empty() || lines[1].empty()) {
-        throw VNNLibException("Malformed opset range output");
+        throw vnnlib::query::VNNLibException("Malformed opset range output");
     }
 
     return {
@@ -190,7 +190,7 @@ std::vector<std::string> parseSupportList(
 
     for (const std::string& line : lines) {
         if (line.empty()) {
-            throw VNNLibException("Malformed support list output");
+            throw vnnlib::query::VNNLibException("Malformed support list output");
         }
     }
 
@@ -201,39 +201,39 @@ std::vector<std::string> parseSupportList(
 
 
 //Parse element type
-TDataType parseElementType(const std::string& value)
+vnnlib::query::TDataType parseElementType(const std::string& value)
 {
-    if (value == "real") return TDataType::Real;
-    if (value == "float16") return TDataType::F16;
-    if (value == "float32") return TDataType::F32;
-    if (value == "float64") return TDataType::F64;
-    if (value == "bfloat16") return TDataType::BF16;
-    if (value == "float8e4m3fn") return TDataType::F8E4M3FN;
-    if (value == "float8e5m2") return TDataType::F8E5M2;
-    if (value == "float8e4m3fnuz") return TDataType::F8E4M3FNUZ;
-    if (value == "float8e5m2fnuz") return TDataType::F8E5M2FNUZ;
-    if (value == "float4e2m1") return TDataType::F4E2M1;
-    if (value == "int8") return TDataType::I8;
-    if (value == "int16") return TDataType::I16;
-    if (value == "int32") return TDataType::I32;
-    if (value == "int64") return TDataType::I64;
-    if (value == "uint8") return TDataType::U8;
-    if (value == "uint16") return TDataType::U16;
-    if (value == "uint32") return TDataType::U32;
-    if (value == "uint64") return TDataType::U64;
-    if (value == "complex64") return TDataType::C64;
-    if (value == "complex128") return TDataType::C128;
-    if (value == "bool") return TDataType::Bool;
+    if (value == "real") return vnnlib::query::TDataType::Real;
+    if (value == "float16") return vnnlib::query::TDataType::F16;
+    if (value == "float32") return vnnlib::query::TDataType::F32;
+    if (value == "float64") return vnnlib::query::TDataType::F64;
+    if (value == "bfloat16") return vnnlib::query::TDataType::BF16;
+    if (value == "float8e4m3fn") return vnnlib::query::TDataType::F8E4M3FN;
+    if (value == "float8e5m2") return vnnlib::query::TDataType::F8E5M2;
+    if (value == "float8e4m3fnuz") return vnnlib::query::TDataType::F8E4M3FNUZ;
+    if (value == "float8e5m2fnuz") return vnnlib::query::TDataType::F8E5M2FNUZ;
+    if (value == "float4e2m1") return vnnlib::query::TDataType::F4E2M1;
+    if (value == "int8") return vnnlib::query::TDataType::I8;
+    if (value == "int16") return vnnlib::query::TDataType::I16;
+    if (value == "int32") return vnnlib::query::TDataType::I32;
+    if (value == "int64") return vnnlib::query::TDataType::I64;
+    if (value == "uint8") return vnnlib::query::TDataType::U8;
+    if (value == "uint16") return vnnlib::query::TDataType::U16;
+    if (value == "uint32") return vnnlib::query::TDataType::U32;
+    if (value == "uint64") return vnnlib::query::TDataType::U64;
+    if (value == "complex64") return vnnlib::query::TDataType::C64;
+    if (value == "complex128") return vnnlib::query::TDataType::C128;
+    if (value == "bool") return vnnlib::query::TDataType::Bool;
 
-    throw VNNLibException("Malformed element type support output");
+    throw vnnlib::query::VNNLibException("Malformed element type support output");
 }
 
 //Parse element type list
-std::vector<TDataType> parseElementTypes(
+std::vector<vnnlib::query::TDataType> parseElementTypes(
     const std::string& output)
 {
     std::vector<std::string> values = parseSupportList(output);
-    std::vector<TDataType> elementTypes;
+    std::vector<vnnlib::query::TDataType> elementTypes;
 
     for (const std::string& value : values) {
         elementTypes.push_back(parseElementType(value));
@@ -249,7 +249,7 @@ bool parseSupportBoolean(const std::string& output)
     std::vector<std::string> lines = splitLines(output);
 
     if (lines.size() != 1) {
-        throw VNNLibException("Malformed boolean support output");
+        throw vnnlib::query::VNNLibException("Malformed boolean support output");
     }
 
     if (lines[0] == "true") {
@@ -260,7 +260,7 @@ bool parseSupportBoolean(const std::string& output)
         return false;
     }
 
-    throw VNNLibException("Malformed boolean support output");
+    throw vnnlib::query::VNNLibException("Malformed boolean support output");
 }
 
 
@@ -275,14 +275,14 @@ std::vector<vnnlib::solver::OperatorSupport> parseOperatorSupport(
 
     for (const std::string& line : lines) {
         if (line.empty()) {
-            throw VNNLibException("Malformed operator support output");
+            throw vnnlib::query::VNNLibException("Malformed operator support output");
         }
 
         std::istringstream stream(line);
         vnnlib::solver::OperatorSupport operatorSupport;
 
         if (!(stream >> operatorSupport.name)) {
-            throw VNNLibException("Malformed operator support output");
+            throw vnnlib::query::VNNLibException("Malformed operator support output");
         }
 
         std::string elementType;
@@ -313,7 +313,7 @@ std::vector<vnnlib::solver::HiddenNodeTheory> parseHiddenNodeTheories(
         } else if (value == "H") {
             theories.push_back(vnnlib::solver::HiddenNodeTheory::H);
         } else {
-            throw VNNLibException("Malformed theory support output");
+            throw vnnlib::query::VNNLibException("Malformed theory support output");
         }
     }
 
@@ -333,7 +333,7 @@ std::vector<vnnlib::solver::MultipleInputOutputTheory> parseMultipleInputOutputT
         } else if (value == "MIO") {
             theories.push_back(vnnlib::solver::MultipleInputOutputTheory::MIO);
         } else {
-            throw VNNLibException("Malformed theory support output");
+            throw vnnlib::query::VNNLibException("Malformed theory support output");
         }
     }
 
@@ -357,7 +357,7 @@ std::vector<vnnlib::solver::MultipleNetworkTheory> parseMultipleNetworkTheories(
         } else if (value == "MNET") {
             theories.push_back(vnnlib::solver::MultipleNetworkTheory::MNET);
         } else {
-            throw VNNLibException("Malformed theory support output");
+            throw vnnlib::query::VNNLibException("Malformed theory support output");
         }
     }
 
@@ -377,7 +377,7 @@ std::vector<vnnlib::solver::MultipleNodeComparisonTheory> parseMultipleNodeCompa
         } else if (value == "MNC") {
             theories.push_back(vnnlib::solver::MultipleNodeComparisonTheory::MNC);
         } else {
-            throw VNNLibException("Malformed theory support output");
+            throw vnnlib::query::VNNLibException("Malformed theory support output");
         }
     }
 
@@ -401,7 +401,7 @@ std::vector<vnnlib::solver::ArithmeticComplexityTheory> parseArithmeticComplexit
         } else if (value == "POLY") {
             theories.push_back(vnnlib::solver::ArithmeticComplexityTheory::POLY);
         } else {
-            throw VNNLibException("Malformed theory support output");
+            throw vnnlib::query::VNNLibException("Malformed theory support output");
         }
     }
 
@@ -422,7 +422,7 @@ std::string runSupports(
         vnnlib::solver::runProcess(executable, arguments);
 
     if (!result.exitedNormally || !result.exitCode.has_value() || result.exitCode.value() != 0) {
-        throw VNNLibException("Solver process failed");
+        throw vnnlib::query::VNNLibException("Solver process failed");
     }
 
     return result.stdoutText;
@@ -455,7 +455,7 @@ vnnlib::solver::VerificationResult parseVerificationResult(
         return vnnlib::solver::VerificationResult::TimedOut;
     }
 
-    throw VNNLibException("Malformed solver output: "+ result);
+    throw vnnlib::query::VNNLibException("Malformed solver output: "+ result);
 }
 }
 
@@ -478,7 +478,7 @@ VerificationResult Solver::verify(
     ProcessResult result = runProcess(executable_, arguments);
 
     if (!result.exitedNormally || !result.exitCode.has_value() || result.exitCode.value() != 0) {
-        throw VNNLibException("Solver process failed");
+        throw vnnlib::query::VNNLibException("Solver process failed");
     }
 
     return parseVerificationResult(result.stdoutText);
@@ -490,7 +490,7 @@ OpsetRange Solver::supportsOnnxOpsetVersions()
         runSupports(executable_, "--onnx-opset-versions"));
 }
 
-std::vector<TDataType> Solver::supportsOnnxElementTypes()
+std::vector<vnnlib::query::TDataType> Solver::supportsOnnxElementTypes()
 {
     return parseElementTypes(
         runSupports(executable_, "--onnx-element-types"));

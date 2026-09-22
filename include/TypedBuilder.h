@@ -5,9 +5,11 @@
 #include <cassert>
 #include <utility>
 
-#include "TypeChecker.h"  
+#include "TypeChecker.h"
 #include "TypedAST.h" 
 #include "Absyn.H"  
+
+namespace vnnlib::query {
 
 class TypedBuilder : public TypeChecker {
 public:
@@ -96,4 +98,6 @@ private:
     template <class T>
     static std::vector<std::unique_ptr<T>> popRange(std::vector<std::unique_ptr<T>>& stack, size_t lowerBound, size_t upperBound);
 };
+
+} // namespace vnnlib::query
 

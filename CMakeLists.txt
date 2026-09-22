@@ -155,6 +155,7 @@ set(MAIN_SRCS
     ${SRC_DIR}/LinearArithExpr.cpp
     ${SRC_DIR}/CompatTransformer.cpp
     ${SRC_DIR}/DNFConverter.cpp
+    ${SRC_DIR}/ProcessRunner.cpp
 )
 
 set(PARSER_MAIN
@@ -294,13 +295,32 @@ endif()
 # Tests
 # ------------------------------------------------------------
 
-if(BUILD_TESTING)
-    add_executable(QueryNamespaceTest tests/QueryNamespaceTest.cpp)
-    target_link_libraries(QueryNamespaceTest PRIVATE VNNLib)
-    add_test(NAME QueryNamespaceTest COMMAND QueryNamespaceTest)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    include(CTest)
 
-    add_executable(QueryCompatibilityTest tests/QueryCompatibilityTest.cpp)
-    target_link_libraries(QueryCompatibilityTest PRIVATE VNNLib)
-    add_test(NAME QueryCompatibilityTest COMMAND QueryCompatibilityTest)
+    if(BUILD_TESTING)
+        # Query namespace tests
+        add_executable(QueryNamespaceTest tests/QueryNamespaceTest.cpp)
+        target_link_libraries(QueryNamespaceTest PRIVATE VNNLib)
+        add_test(NAME QueryNamespaceTest COMMAND QueryNamespaceTest)
 
+        add_executable(QueryCompatibilityTest tests/QueryCompatibilityTest.cpp)
+        target_link_libraries(QueryCompatibilityTest PRIVATE VNNLib)
+        add_test(NAME QueryCompatibilityTest COMMAND QueryCompatibilityTest)
+
+        # Solver process runner tests
+        add_executable(SolverRunnerTests
+            tests/SolverRunnerTests.cpp
+            src/ProcessRunner.cpp
+        )
+
+        add_executable(MockProcess
+            tests/MockProcess.cpp
+        )
+
+        add_test(
+            NAME SolverRunnerTests
+            COMMAND SolverRunnerTests $<TARGET_FILE:MockProcess>
+        )
+    endif()
 endif()

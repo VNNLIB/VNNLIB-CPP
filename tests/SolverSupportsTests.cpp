@@ -66,31 +66,45 @@ int main(int argc, char* argv[]) {
     }
 
     if (solver.supportsHiddenNodeTheories() !=
-        std::vector<std::string>{"NH", "H"}) {
+        std::vector<vnnlib::solver::HiddenNodeTheory>{
+            vnnlib::solver::HiddenNodeTheory::NH,
+            vnnlib::solver::HiddenNodeTheory::H}) {
         std::cerr << "Unexpected hidden node theories\n";
         return 1;
     }
 
     if (solver.supportsMultipleInputOutputTheories() !=
-        std::vector<std::string>{"SIO", "MIO"}) {
+        std::vector<vnnlib::solver::MultipleInputOutputTheory>{
+            vnnlib::solver::MultipleInputOutputTheory::SIO,
+            vnnlib::solver::MultipleInputOutputTheory::MIO}) {
         std::cerr << "Unexpected input/output theories\n";
         return 1;
     }
 
     if (solver.supportsMultipleNetworkTheories() !=
-        std::vector<std::string>{"SNET", "MNET", "MENET", "MINET"}) {
+        std::vector<vnnlib::solver::MultipleNetworkTheory>{
+            vnnlib::solver::MultipleNetworkTheory::SNET,
+            vnnlib::solver::MultipleNetworkTheory::MNET,
+            vnnlib::solver::MultipleNetworkTheory::MENET,
+            vnnlib::solver::MultipleNetworkTheory::MINET}) {
         std::cerr << "Unexpected network theories\n";
         return 1;
     }
 
     if (solver.supportsMultipleNodeComparisonTheories() !=
-        std::vector<std::string>{"SNC", "MNC"}) {
+        std::vector<vnnlib::solver::MultipleNodeComparisonTheory>{
+            vnnlib::solver::MultipleNodeComparisonTheory::SNC,
+            vnnlib::solver::MultipleNodeComparisonTheory::MNC}) {
         std::cerr << "Unexpected comparison theories\n";
         return 1;
     }
 
     if (solver.supportsArithmeticComplexityTheories() !=
-        std::vector<std::string>{"BND", "OUTC", "LIN", "POLY"}) {
+        std::vector<vnnlib::solver::ArithmeticComplexityTheory>{
+            vnnlib::solver::ArithmeticComplexityTheory::BND,
+            vnnlib::solver::ArithmeticComplexityTheory::OUTC,
+            vnnlib::solver::ArithmeticComplexityTheory::LIN,
+            vnnlib::solver::ArithmeticComplexityTheory::POLY}) {
         std::cerr << "Unexpected arithmetic theories\n";
         return 1;
     }

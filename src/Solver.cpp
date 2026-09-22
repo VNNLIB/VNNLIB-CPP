@@ -300,20 +300,112 @@ std::vector<vnnlib::solver::OperatorSupport> parseOperatorSupport(
 
 
 
-//Parse theory list
-std::vector<std::string> parseTheoryList(
-    const std::string& output,
-    const std::vector<std::string>& allowed)
+//Parse hidden node theories
+std::vector<vnnlib::solver::HiddenNodeTheory> parseHiddenNodeTheories(
+    const std::string& output)
 {
     std::vector<std::string> values = parseSupportList(output);
+    std::vector<vnnlib::solver::HiddenNodeTheory> theories;
 
     for (const std::string& value : values) {
-        if (std::find(allowed.begin(), allowed.end(), value) == allowed.end()) {
+        if (value == "NH") {
+            theories.push_back(vnnlib::solver::HiddenNodeTheory::NH);
+        } else if (value == "H") {
+            theories.push_back(vnnlib::solver::HiddenNodeTheory::H);
+        } else {
             throw VNNLibException("Malformed theory support output");
         }
     }
 
-    return values;
+    return theories;
+}
+
+//Parse multiple input output theories
+std::vector<vnnlib::solver::MultipleInputOutputTheory> parseMultipleInputOutputTheories(
+    const std::string& output)
+{
+    std::vector<std::string> values = parseSupportList(output);
+    std::vector<vnnlib::solver::MultipleInputOutputTheory> theories;
+
+    for (const std::string& value : values) {
+        if (value == "SIO") {
+            theories.push_back(vnnlib::solver::MultipleInputOutputTheory::SIO);
+        } else if (value == "MIO") {
+            theories.push_back(vnnlib::solver::MultipleInputOutputTheory::MIO);
+        } else {
+            throw VNNLibException("Malformed theory support output");
+        }
+    }
+
+    return theories;
+}
+
+//Parse multiple network theories
+std::vector<vnnlib::solver::MultipleNetworkTheory> parseMultipleNetworkTheories(
+    const std::string& output)
+{
+    std::vector<std::string> values = parseSupportList(output);
+    std::vector<vnnlib::solver::MultipleNetworkTheory> theories;
+
+    for (const std::string& value : values) {
+        if (value == "SNET") {
+            theories.push_back(vnnlib::solver::MultipleNetworkTheory::SNET);
+        } else if (value == "MENET") {
+            theories.push_back(vnnlib::solver::MultipleNetworkTheory::MENET);
+        } else if (value == "MINET") {
+            theories.push_back(vnnlib::solver::MultipleNetworkTheory::MINET);
+        } else if (value == "MNET") {
+            theories.push_back(vnnlib::solver::MultipleNetworkTheory::MNET);
+        } else {
+            throw VNNLibException("Malformed theory support output");
+        }
+    }
+
+    return theories;
+}
+
+//Parse multiple node comparison theories
+std::vector<vnnlib::solver::MultipleNodeComparisonTheory> parseMultipleNodeComparisonTheories(
+    const std::string& output)
+{
+    std::vector<std::string> values = parseSupportList(output);
+    std::vector<vnnlib::solver::MultipleNodeComparisonTheory> theories;
+
+    for (const std::string& value : values) {
+        if (value == "SNC") {
+            theories.push_back(vnnlib::solver::MultipleNodeComparisonTheory::SNC);
+        } else if (value == "MNC") {
+            theories.push_back(vnnlib::solver::MultipleNodeComparisonTheory::MNC);
+        } else {
+            throw VNNLibException("Malformed theory support output");
+        }
+    }
+
+    return theories;
+}
+
+//Parse arithmetic complexity theories
+std::vector<vnnlib::solver::ArithmeticComplexityTheory> parseArithmeticComplexityTheories(
+    const std::string& output)
+{
+    std::vector<std::string> values = parseSupportList(output);
+    std::vector<vnnlib::solver::ArithmeticComplexityTheory> theories;
+
+    for (const std::string& value : values) {
+        if (value == "BND") {
+            theories.push_back(vnnlib::solver::ArithmeticComplexityTheory::BND);
+        } else if (value == "OUTC") {
+            theories.push_back(vnnlib::solver::ArithmeticComplexityTheory::OUTC);
+        } else if (value == "LIN") {
+            theories.push_back(vnnlib::solver::ArithmeticComplexityTheory::LIN);
+        } else if (value == "POLY") {
+            theories.push_back(vnnlib::solver::ArithmeticComplexityTheory::POLY);
+        } else {
+            throw VNNLibException("Malformed theory support output");
+        }
+    }
+
+    return theories;
 }
 
 
@@ -416,39 +508,34 @@ VersionRange Solver::supportsVNNLibVersions()
         runSupports(executable_, "--vnnlib-versions"));
 }
 
-std::vector<std::string> Solver::supportsHiddenNodeTheories()
+std::vector<HiddenNodeTheory> Solver::supportsHiddenNodeTheories()
 {
-    return parseTheoryList(
-        runSupports(executable_, "--hidden-node-theories"),
-        {"NH", "H"});
+    return parseHiddenNodeTheories(
+        runSupports(executable_, "--hidden-node-theories"));
 }
 
-std::vector<std::string> Solver::supportsMultipleInputOutputTheories()
+std::vector<MultipleInputOutputTheory> Solver::supportsMultipleInputOutputTheories()
 {
-    return parseTheoryList(
-        runSupports(executable_, "--multiple-input-output-theories"),
-        {"SIO", "MIO"});
+    return parseMultipleInputOutputTheories(
+        runSupports(executable_, "--multiple-input-output-theories"));
 }
 
-std::vector<std::string> Solver::supportsMultipleNetworkTheories()
+std::vector<MultipleNetworkTheory> Solver::supportsMultipleNetworkTheories()
 {
-    return parseTheoryList(
-        runSupports(executable_, "--multiple-network-theories"),
-        {"SNET", "MNET", "MENET", "MINET"});
+    return parseMultipleNetworkTheories(
+        runSupports(executable_, "--multiple-network-theories"));
 }
 
-std::vector<std::string> Solver::supportsMultipleNodeComparisonTheories()
+std::vector<MultipleNodeComparisonTheory> Solver::supportsMultipleNodeComparisonTheories()
 {
-    return parseTheoryList(
-        runSupports(executable_, "--multiple-node-comparison-theories"),
-        {"SNC", "MNC"});
+    return parseMultipleNodeComparisonTheories(
+        runSupports(executable_, "--multiple-node-comparison-theories"));
 }
 
-std::vector<std::string> Solver::supportsArithmeticComplexityTheories()
+std::vector<ArithmeticComplexityTheory> Solver::supportsArithmeticComplexityTheories()
 {
-    return parseTheoryList(
-        runSupports(executable_, "--arithmetic-complexity-theories"),
-        {"BND", "OUTC", "LIN", "POLY"});
+    return parseArithmeticComplexityTheories(
+        runSupports(executable_, "--arithmetic-complexity-theories"));
 }
 
 bool Solver::supportsOptimisedDisjunctiveReasoning()

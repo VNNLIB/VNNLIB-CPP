@@ -17,6 +17,35 @@ enum class VerificationResult {
     TimedOut
 };
 
+enum class HiddenNodeTheory {
+    NH,
+    H
+};
+
+enum class MultipleInputOutputTheory {
+    SIO,
+    MIO
+};
+
+enum class MultipleNetworkTheory {
+    SNET,
+    MENET,
+    MINET,
+    MNET
+};
+
+enum class MultipleNodeComparisonTheory {
+    SNC,
+    MNC
+};
+
+enum class ArithmeticComplexityTheory {
+    BND,
+    OUTC,
+    LIN,
+    POLY
+};
+
 struct VNNLIB_API SemanticVersion {
     int major;
     int minor;
@@ -57,11 +86,11 @@ class VNNLIB_API Solver {
     std::vector<TDataType> supportsOnnxElementTypes();
     std::vector<OperatorSupport> supportsOnnxOperators();
     VersionRange supportsVNNLibVersions();
-    std::vector<std::string> supportsHiddenNodeTheories();
-    std::vector<std::string> supportsMultipleInputOutputTheories();
-    std::vector<std::string> supportsMultipleNetworkTheories();
-    std::vector<std::string> supportsMultipleNodeComparisonTheories();
-    std::vector<std::string> supportsArithmeticComplexityTheories();
+    std::vector<HiddenNodeTheory> supportsHiddenNodeTheories();
+    std::vector<MultipleInputOutputTheory> supportsMultipleInputOutputTheories();
+    std::vector<MultipleNetworkTheory> supportsMultipleNetworkTheories();
+    std::vector<MultipleNodeComparisonTheory> supportsMultipleNodeComparisonTheories();
+    std::vector<ArithmeticComplexityTheory> supportsArithmeticComplexityTheories();
     bool supportsOptimisedDisjunctiveReasoning();
     bool supportsSerialiseAssignments();
 

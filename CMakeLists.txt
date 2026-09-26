@@ -149,6 +149,7 @@ endif()
 
 set(MAIN_SRCS
     ${SRC_DIR}/VNNLib.cpp
+    ${SRC_DIR}/Solver.cpp
     ${SRC_DIR}/TypeChecker.cpp
     ${SRC_DIR}/TypedAST.cpp
     ${SRC_DIR}/TypedBuilder.cpp
@@ -307,6 +308,42 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
         add_executable(QueryCompatibilityTest tests/QueryCompatibilityTest.cpp)
         target_link_libraries(QueryCompatibilityTest PRIVATE VNNLib)
         add_test(NAME QueryCompatibilityTest COMMAND QueryCompatibilityTest)
+
+        # Solver verify and supports tests
+        add_executable(VerifyTestSolver
+            tests/VerifyTestSolver.cpp
+        )
+
+        add_executable(SolverVerifyTests
+            tests/SolverVerifyTests.cpp
+        )
+
+        add_executable(SupportsTestSolver
+            tests/SupportsTestSolver.cpp
+        )
+
+        add_executable(SupportsEdgeTestSolver
+            tests/SupportsEdgeTestSolver.cpp
+        )
+
+        add_executable(SolverSupportsTests
+            tests/SolverSupportsTests.cpp
+        )
+
+        target_link_libraries(SolverVerifyTests PRIVATE VNNLib)
+        target_link_libraries(SolverSupportsTests PRIVATE VNNLib)
+
+        add_test(
+            NAME SolverVerifyTests
+            COMMAND SolverVerifyTests $<TARGET_FILE:VerifyTestSolver>
+        )
+
+        add_test(
+            NAME SolverSupportsTests
+            COMMAND SolverSupportsTests
+                $<TARGET_FILE:SupportsTestSolver>
+                $<TARGET_FILE:SupportsEdgeTestSolver>
+        )
 
         # Solver process runner tests
         add_executable(SolverRunnerTests

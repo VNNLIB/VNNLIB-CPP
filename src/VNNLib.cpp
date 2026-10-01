@@ -2,6 +2,23 @@
 
 namespace vnnlib::query {
 
+std::string hiddenNodeTheory(const TQuery& query) {
+    for (const auto& network : query.networks) {
+        // A declaration counts even when no assertion mentions the hidden node.
+        if (network && !network->hidden.empty()) return "H";
+    }
+    return "NH";
+}
+
+std::string inputOutputTheory(const TQuery& query) {
+    for (const auto& network : query.networks) {
+        // Count declared nodes, not tensor elements or assertion references.
+        if (network && (network->inputs.size() > 1 || network->outputs.size() > 1))
+            return "MIO";
+    }
+    return "SIO";
+}
+
 std::unique_ptr<TQuery> parseQueryFile(std::string path) {
     FILE *file = fopen(path.c_str(), "r");
     if (!file) {

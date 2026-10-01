@@ -24,6 +24,10 @@ VNNLIB_API std::unique_ptr<TQuery> parseQueryString(std::string content);
 VNNLIB_API std::string checkQueryFile(std::string path);
 VNNLIB_API std::string checkQueryString(std::string content);
 
+// Compute the least permissive theory on demand (VNN-LIB 2.0, 4.1.1-4.1.2).
+VNNLIB_API std::string hiddenNodeTheory(const TQuery& query); // NH or H
+VNNLIB_API std::string inputOutputTheory(const TQuery& query); // SIO or MIO
+
 } // namespace vnnlib::query
 
 #ifndef VNNLIB_NO_DEPRECATED_QUERY_API

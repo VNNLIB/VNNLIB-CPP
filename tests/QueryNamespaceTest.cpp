@@ -78,10 +78,43 @@ void testEnumsHelpersAndExceptions() {
     assert(caught);
 }
 
+void testQueryTheories() {
+    auto parsed = query::parseQueryString(queryText);
+    assert(query::hiddenNodeTheory(*parsed) == "NH");
+    assert(query::inputOutputTheory(*parsed) == "SIO");
+
+    const std::string hidden = R"(
+(vnnlib-version <2.0>)
+(declare-network test
+    (declare-input X real [2])
+    (declare-hidden H real [1] "hidden")
+    (declare-output Y real [1])
+)
+(assert (<= X[0] 1.0))
+)";
+    parsed = query::parseQueryString(hidden);
+    assert(query::hiddenNodeTheory(*parsed) == "H");
+    assert(query::inputOutputTheory(*parsed) == "SIO");
+
+    const std::string multipleInputs = R"(
+(vnnlib-version <2.0>)
+(declare-network test
+    (declare-input X real [1])
+    (declare-input Z real [1])
+    (declare-output Y real [1])
+)
+(assert (<= X[0] 1.0))
+)";
+    parsed = query::parseQueryString(multipleInputs);
+    assert(query::hiddenNodeTheory(*parsed) == "NH");
+    assert(query::inputOutputTheory(*parsed) == "MIO");
+}
+
 } // namespace
 
 int main() {
     testParsingAndAstTypes();
     testTransformations();
     testEnumsHelpersAndExceptions();
+    testQueryTheories();
 }

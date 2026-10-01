@@ -82,7 +82,9 @@ void testQueryTheories() {
     auto parsed = query::parseQueryString(queryText);
     assert(query::hiddenNodeTheory(*parsed) == "NH");
     assert(query::inputOutputTheory(*parsed) == "SIO");
+    assert(query::multipleNetworksTheory(*parsed) == "SNET");
 
+    // Hidden Nodes Theory
     const std::string hidden = R"(
 (vnnlib-version <2.0>)
 (declare-network test
@@ -95,7 +97,9 @@ void testQueryTheories() {
     parsed = query::parseQueryString(hidden);
     assert(query::hiddenNodeTheory(*parsed) == "H");
     assert(query::inputOutputTheory(*parsed) == "SIO");
+    assert(query::multipleNetworksTheory(*parsed) == "SNET");
 
+    // Multiple Inputs/Outputs Theory
     const std::string multipleInputs = R"(
 (vnnlib-version <2.0>)
 (declare-network test
@@ -108,6 +112,74 @@ void testQueryTheories() {
     parsed = query::parseQueryString(multipleInputs);
     assert(query::hiddenNodeTheory(*parsed) == "NH");
     assert(query::inputOutputTheory(*parsed) == "MIO");
+    assert(query::multipleNetworksTheory(*parsed) == "SNET");
+
+    // Multiple Networks Theory
+    const std::string snet = R"(
+(vnnlib-version <2.0>)
+(declare-network f
+    (declare-input X float32 [1])
+    (declare-output Y float32 [1])
+)
+(assert (<= X[0] 1.0))
+)";
+    parsed = query::parseQueryString(snet);
+    assert(query::hiddenNodeTheory(*parsed) == "NH");
+    assert(query::inputOutputTheory(*parsed) == "SIO");
+    assert(query::multipleNetworksTheory(*parsed) == "SNET");
+
+    const std::string mnet = R"(
+(vnnlib-version <2.0>)
+(declare-network f
+    (declare-input X float32 [1])
+    (declare-output Y float32 [1])
+)
+(declare-network g
+    (declare-input U float32 [1])
+    (declare-output W float32 [1])
+)
+(assert (<= X[0] 1.0))
+)";
+    parsed = query::parseQueryString(mnet);
+    assert(query::hiddenNodeTheory(*parsed) == "NH");
+    assert(query::inputOutputTheory(*parsed) == "SIO");
+    assert(query::multipleNetworksTheory(*parsed) == "MNET");
+
+    const std::string minet = R"(
+(vnnlib-version <2.0>)
+(declare-network f
+    (declare-input A float32 [1,10])
+    (declare-output B float32 [1,2])
+)
+(declare-network g
+    (isomorphic-to f)
+    (declare-input C float32 [1,10])
+    (declare-output D float32 [1,2])
+)
+(assert (<= A[0, 0] 1.0))
+)";
+    parsed = query::parseQueryString(minet);
+    assert(query::hiddenNodeTheory(*parsed) == "NH");
+    assert(query::inputOutputTheory(*parsed) == "SIO");
+    assert(query::multipleNetworksTheory(*parsed) == "MINET");
+
+    const std::string menet = R"(
+(vnnlib-version <2.0>)
+(declare-network f
+    (declare-input A float32 [1,10])
+    (declare-output B float32 [1,2])
+)
+(declare-network f_copy
+    (equal-to f)
+    (declare-input C float32 [1,10])
+    (declare-output D float32 [1,2])
+)
+(assert (<= A[0, 0] 1.0))
+)";
+    parsed = query::parseQueryString(menet);
+    assert(query::hiddenNodeTheory(*parsed) == "NH");
+    assert(query::inputOutputTheory(*parsed) == "SIO");
+    assert(query::multipleNetworksTheory(*parsed) == "MENET");
 }
 
 } // namespace

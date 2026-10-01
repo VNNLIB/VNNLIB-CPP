@@ -19,6 +19,31 @@ std::string inputOutputTheory(const TQuery& query) {
     return "SIO";
 }
 
+std::string multipleNetworksTheory(const TQuery& query) {
+    // If there is only one network, it is a single network
+    if (query.networks.size() == 1) return "SNET";
+
+    // Count the number of networks with equal-to or isomorphic-to declarations
+    int equalCount = 0, isomorphicCount = 0;
+    for (const auto& network : query.networks) {
+        if (network->equalTo != "") equalCount++;
+        if (network->isometricTo != "") isomorphicCount++;
+    }
+
+    // If there are multiple network declarations and all but one contains an equal-to, it is MENET
+    if (equalCount == static_cast<int>(query.networks.size()) - 1) return "MENET";
+
+    // If there are multiple network declarations and all but one contains an isomorphic-to, it is MINET
+    if (isomorphicCount == static_cast<int>(query.networks.size()) - 1) return "MINET";
+
+    // If the network does not match any of the other sets, it is MNET
+    return "MNET";
+}
+
+std::string multipleNodeComparisonsTheory(const TQuery& query) {
+    return "";
+}
+
 std::unique_ptr<TQuery> parseQueryFile(std::string path) {
     FILE *file = fopen(path.c_str(), "r");
     if (!file) {

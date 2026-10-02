@@ -180,6 +180,43 @@ void testQueryTheories() {
     assert(query::hiddenNodeTheory(*parsed) == "NH");
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "MENET");
+
+    const std::string snc = R"(
+(vnnlib-version <2.0>)
+(declare-network f
+    (declare-input X float32 [2])
+    (declare-output Y float32 [1])
+)
+(declare-network g
+    (declare-input A float32 [2])
+    (declare-hidden H float32 [1] "hidden")
+    (declare-output B float32 [1])
+)
+(assert (<= (+ X[0] X[1]) 0.1))
+(assert (<= Y[0] 0.1))
+(assert (<= H[0] 0.5))
+(assert (== Y[0] A[0]))
+)";
+    parsed = query::parseQueryString(snc);
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
+
+    const std::string mnc = R"(
+(vnnlib-version <2.0>)
+(declare-network f
+    (declare-input X float32 [2])
+    (declare-output Y float32 [1])
+)
+(declare-network g
+    (declare-input A float32 [2])
+    (declare-hidden H float32 [1] "hidden")
+    (declare-output B float32 [1])
+)
+(assert (<= (+ X[0] Y[0]) 0.1))
+(assert (<= H[0] A[1]))
+(assert (== B[0] H[0]))
+)";
+    parsed = query::parseQueryString(mnc);
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "MNC");
 }
 
 } // namespace

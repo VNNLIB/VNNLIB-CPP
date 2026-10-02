@@ -1,5 +1,19 @@
 #include "VNNLib.h"
 
+namespace {
+    void getChildren(const vnnlib::query::TNode *node, std::vector<const vnnlib::query::TVarExpr *>& expressions) {
+        // Retrieve the children of the current node
+        std::vector<const vnnlib::query::TNode *> children;
+        node->children(children);
+
+        // Recursively go through each child of the current node
+        for (const vnnlib::query::TNode *child : children) {
+            if (auto c = dynamic_cast<const vnnlib::query::TVarExpr *>(child)) expressions.push_back(c); //std::cout << child->toString() << ' ' << c->symbol->name << ' ' << typeid(c->indices).name() << '\n';
+            getChildren(child, expressions);
+        }
+    }
+}
+
 namespace vnnlib::query {
 
 std::string hiddenNodeTheory(const TQuery& query) {
@@ -40,23 +54,11 @@ std::string multipleNetworksTheory(const TQuery& query) {
     return "MNET";
 }
 
-void getChildren(const TNode *node, std::vector<const TVarExpr *>& expressions) {
-    // Retrieve the children of the current node
-    std::vector<const vnnlib::query::TNode *> children;
-    node->children(children);
-
-    // Recursively go through each child of the current node
-    for (const TNode *child : children) {
-        if (auto c = dynamic_cast<const TVarExpr *>(child)) expressions.push_back(c); //std::cout << child->toString() << ' ' << c->symbol->name << ' ' << typeid(c->indices).name() << '\n';
-        getChildren(child, expressions);
-    }
-}
-
 std::string multipleNodeComparisonsTheory(const TQuery& query) {
     // Process each assertion in the query
     for (const auto& assertion : query.assertions) {
         // Create a vector to hold all the found expressions
-        std::vector<const TVarExpr *> expressions;
+        std::vector<const vnnlib::query::TVarExpr *> expressions;
 
         // Find all variables in the assertion
         getChildren(assertion.get(), expressions);

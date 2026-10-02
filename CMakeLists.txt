@@ -309,6 +309,29 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
         target_link_libraries(QueryCompatibilityTest PRIVATE VNNLib)
         add_test(NAME QueryCompatibilityTest COMMAND QueryCompatibilityTest)
 
+        add_executable(QueryFileTest tests/QueryFileTest.cpp)
+        target_link_libraries(QueryFileTest PRIVATE VNNLib)
+        add_test(NAME QueryFileTest COMMAND QueryFileTest
+            "${CMAKE_CURRENT_BINARY_DIR}/query_namespace.vnnlib")
+
+        # Keep runtime assertions active in Release CI builds too.
+        foreach(query_test IN ITEMS QueryNamespaceTest QueryCompatibilityTest QueryFileTest)
+            if(MSVC)
+                target_compile_options(${query_test} PRIVATE /UNDEBUG)
+            else()
+                target_compile_options(${query_test} PRIVATE -UNDEBUG)
+            endif()
+        endforeach()
+
+        add_test(NAME QueryDeprecationTest COMMAND ${CMAKE_COMMAND}
+            "-DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
+            "-DBINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}"
+            "-DCXX_COMPILER=${CMAKE_CXX_COMPILER}"
+            "-DGENERATOR=${CMAKE_GENERATOR}"
+            "-DGENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}"
+            "-DGENERATOR_TOOLSET=${CMAKE_GENERATOR_TOOLSET}"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/QueryDeprecationTest.cmake")
+
         # Solver verify and supports tests
         add_executable(VerifyTestSolver
             tests/VerifyTestSolver.cpp

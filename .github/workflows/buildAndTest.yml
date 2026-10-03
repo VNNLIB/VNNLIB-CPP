@@ -24,7 +24,7 @@ jobs:
                 make -j$(nproc)
                 echo "Build completed successfully"
 
-            - name: Test Solver interface
+            - name: Test Query and Solver interfaces
               run: ctest --test-dir build --output-on-failure
 
             - name: Test VNNLib files
@@ -36,9 +36,6 @@ jobs:
                   ../bin/VNNLibParser check "$file"
                 done
                 echo "All tests passed"
-
-            - name: Test Solver interface
-              run: ctest --test-dir build --output-on-failure
 
     build-and-test-windows:
         runs-on: windows-latest
@@ -54,7 +51,7 @@ jobs:
             - name: Build
               run: cmake --build build --config Release
 
-            - name: Test Solver interface
+            - name: Test Query and Solver interfaces
               run: ctest --test-dir build -C Release --output-on-failure
 
             - name: Test VNNLib files
@@ -65,9 +62,6 @@ jobs:
                   ../bin/Release/VNNLibParser.exe check $file.FullName
                 }
                 Write-Host "All tests passed"
-            
-            - name: Test Solver interface
-              run: ctest --test-dir build -C Release --output-on-failure
 
     build-and-test-macos:
         runs-on: macos-latest
@@ -83,7 +77,7 @@ jobs:
             - name: Build
               run: cmake --build build --config Release
 
-            - name: Test Solver interface
+            - name: Test Query and Solver interfaces
               run: ctest --test-dir build --output-on-failure
 
             - name: Test VNNLib files
@@ -94,9 +88,6 @@ jobs:
                   ../bin/VNNLibParser check "$file"
                 done
                 echo "All tests passed"
-
-            - name: Test Solver interface
-              run: ctest --test-dir build -C Release --output-on-failure
 
     build-and-test-from-grammar:
         runs-on: ubuntu-latest

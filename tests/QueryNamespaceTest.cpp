@@ -84,6 +84,8 @@ void testQueryTheories() {
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "SNET");
     assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
+    assert(query::arithmeticComplexityTheory(*parsed) == "LIN");
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"Real"}));
 
     // Hidden Nodes Theory
     const std::string hidden = R"(
@@ -100,6 +102,8 @@ void testQueryTheories() {
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "SNET");
     assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
+    assert(query::arithmeticComplexityTheory(*parsed) == "BND");
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"Real"}));
 
     // Multiple Inputs/Outputs Theory
     const std::string multipleInputs = R"(
@@ -116,6 +120,8 @@ void testQueryTheories() {
     assert(query::inputOutputTheory(*parsed) == "MIO");
     assert(query::multipleNetworksTheory(*parsed) == "SNET");
     assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
+    assert(query::arithmeticComplexityTheory(*parsed) == "BND");
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"Real"}));
 
     // Multiple Networks Theory
     const std::string snet = R"(
@@ -131,6 +137,8 @@ void testQueryTheories() {
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "SNET");
     assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
+    assert(query::arithmeticComplexityTheory(*parsed) == "BND");
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"F32"}));
 
     const std::string mnet = R"(
 (vnnlib-version <2.0>)
@@ -149,6 +157,8 @@ void testQueryTheories() {
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "MNET");
     assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
+    assert(query::arithmeticComplexityTheory(*parsed) == "BND");
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"F32"}));
 
     const std::string minet = R"(
 (vnnlib-version <2.0>)
@@ -168,6 +178,8 @@ void testQueryTheories() {
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "MINET");
     assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
+    assert(query::arithmeticComplexityTheory(*parsed) == "BND");
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"F32"}));
 
     const std::string menet = R"(
 (vnnlib-version <2.0>)
@@ -187,7 +199,11 @@ void testQueryTheories() {
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "MENET");
     assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
+    assert(query::arithmeticComplexityTheory(*parsed) == "BND");
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"F32"}));
 
+
+    // Multiple Node Comparisons Theory
     const std::string snc = R"(
 (vnnlib-version <2.0>)
 (declare-network f
@@ -209,6 +225,8 @@ void testQueryTheories() {
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "MNET");
     assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
+    assert(query::arithmeticComplexityTheory(*parsed) == "LIN");
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"F32"}));
 
     const std::string mnc = R"(
 (vnnlib-version <2.0>)
@@ -230,6 +248,8 @@ void testQueryTheories() {
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "MNET");
     assert(query::multipleNodeComparisonsTheory(*parsed) == "MNC");
+    assert(query::arithmeticComplexityTheory(*parsed) == "LIN");
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"F32"}));
 
     // Arithmetic Complexity Theory (examples from standard section 4.1.5)
     const std::string net = R"(
@@ -240,17 +260,46 @@ void testQueryTheories() {
 )
 )";
     parsed = query::parseQueryString(net + "(assert (<= X[0] 1.0))\n(assert (>= Y[0] 0.5))");
+    assert(query::hiddenNodeTheory(*parsed) == "NH");
+    assert(query::inputOutputTheory(*parsed) == "SIO");
+    assert(query::multipleNetworksTheory(*parsed) == "SNET");
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
     assert(query::arithmeticComplexityTheory(*parsed) == "BND");
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"Real"}));
+
     parsed = query::parseQueryString(net + "(assert (<= X[0] 1.0))\n(assert (>= Y[0] Y[1]))");
+    assert(query::hiddenNodeTheory(*parsed) == "NH");
+    assert(query::inputOutputTheory(*parsed) == "SIO");
+    assert(query::multipleNetworksTheory(*parsed) == "SNET");
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
     assert(query::arithmeticComplexityTheory(*parsed) == "OUTC");
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"Real"}));
+
     parsed = query::parseQueryString(net + "(assert (<= (+ (* 0.5 X[0]) (* 0.75 X[1])) 1.0))\n(assert (>= (+ Y[0] Y[1]) 0.5))");
+    assert(query::hiddenNodeTheory(*parsed) == "NH");
+    assert(query::inputOutputTheory(*parsed) == "SIO");
+    assert(query::multipleNetworksTheory(*parsed) == "SNET");
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
     assert(query::arithmeticComplexityTheory(*parsed) == "LIN");
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"Real"}));
+
     parsed = query::parseQueryString(net + "(assert (<= (* X[0] X[1]) 1.0))\n(assert (>= (+ Y[0] Y[1]) 0.5))");
+    assert(query::hiddenNodeTheory(*parsed) == "NH");
+    assert(query::inputOutputTheory(*parsed) == "SIO");
+    assert(query::multipleNetworksTheory(*parsed) == "SNET");
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
     assert(query::arithmeticComplexityTheory(*parsed) == "POLY");
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"Real"}));
 
     // Element Type Theories
     parsed = query::parseQueryString(net + "(assert (<= X[0] 1.0))");
+    assert(query::hiddenNodeTheory(*parsed) == "NH");
+    assert(query::inputOutputTheory(*parsed) == "SIO");
+    assert(query::multipleNetworksTheory(*parsed) == "SNET");
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
+    assert(query::arithmeticComplexityTheory(*parsed) == "BND");
     assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"Real"}));
+
     const std::string mixed = R"(
 (vnnlib-version <2.0>)
 (declare-network a
@@ -260,6 +309,11 @@ void testQueryTheories() {
 (assert (<= X[0] 1.0))
 )";
     parsed = query::parseQueryString(mixed);
+    assert(query::hiddenNodeTheory(*parsed) == "NH");
+    assert(query::inputOutputTheory(*parsed) == "SIO");
+    assert(query::multipleNetworksTheory(*parsed) == "SNET");
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
+    assert(query::arithmeticComplexityTheory(*parsed) == "BND");
     assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"F16", "F32"}));
 }
 

@@ -230,6 +230,37 @@ void testQueryTheories() {
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "MNET");
     assert(query::multipleNodeComparisonsTheory(*parsed) == "MNC");
+
+    // Arithmetic Complexity Theory (examples from standard section 4.1.5)
+    const std::string net = R"(
+(vnnlib-version <2.0>)
+(declare-network test
+    (declare-input X real [2])
+    (declare-output Y real [2])
+)
+)";
+    parsed = query::parseQueryString(net + "(assert (<= X[0] 1.0))\n(assert (>= Y[0] 0.5))");
+    assert(query::arithmeticComplexityTheory(*parsed) == "BND");
+    parsed = query::parseQueryString(net + "(assert (<= X[0] 1.0))\n(assert (>= Y[0] Y[1]))");
+    assert(query::arithmeticComplexityTheory(*parsed) == "OUTC");
+    parsed = query::parseQueryString(net + "(assert (<= (+ (* 0.5 X[0]) (* 0.75 X[1])) 1.0))\n(assert (>= (+ Y[0] Y[1]) 0.5))");
+    assert(query::arithmeticComplexityTheory(*parsed) == "LIN");
+    parsed = query::parseQueryString(net + "(assert (<= (* X[0] X[1]) 1.0))\n(assert (>= (+ Y[0] Y[1]) 0.5))");
+    assert(query::arithmeticComplexityTheory(*parsed) == "POLY");
+
+    // Element Type Theories
+    parsed = query::parseQueryString(net + "(assert (<= X[0] 1.0))");
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"Real"}));
+    const std::string mixed = R"(
+(vnnlib-version <2.0>)
+(declare-network a
+    (declare-input X float16 [2])
+    (declare-output Y float32 [1])
+)
+(assert (<= X[0] 1.0))
+)";
+    parsed = query::parseQueryString(mixed);
+    assert((query::elementTypeTheories(*parsed) == std::vector<std::string>{"F16", "F32"}));
 }
 
 } // namespace

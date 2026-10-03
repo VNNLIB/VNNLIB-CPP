@@ -1,4 +1,6 @@
 #include "VNNLib.h"
+#include "LinearArithExpr.h"
+#include <set>
 
 namespace {
     void getVariables(const vnnlib::query::TNode *node, std::vector<const vnnlib::query::TVarExpr *>& variables) {
@@ -10,6 +12,54 @@ namespace {
         for (const vnnlib::query::TNode *child : children) {
             if (auto c = dynamic_cast<const vnnlib::query::TVarExpr *>(child)) variables.push_back(c); //std::cout << child->toString() << ' ' << c->symbol->name << ' ' << typeid(c->indices).name() << '\n';
             getVariables(child, variables);
+        }
+    }
+
+    // Collect every comparison under a node, including ones nested inside and/or
+    void getComparisons(const vnnlib::query::TNode *node, std::vector<const vnnlib::query::TCompare *>& out) {
+        std::vector<const vnnlib::query::TNode *> children;
+        node->children(children);
+        for (const vnnlib::query::TNode *child : children) {
+            if (auto c = dynamic_cast<const vnnlib::query::TCompare *>(child)) out.push_back(c);
+            getComparisons(child, out);
+        }
+    }
+
+    // True if the expression is just a variable, with nothing done to it
+    bool isBareVariable(const vnnlib::query::TArithExpr *expr) {
+        return dynamic_cast<const vnnlib::query::TVarExpr *>(expr) != nullptr;
+    }
+
+    // True if the expression is just a number
+    bool isConstant(const vnnlib::query::TArithExpr *expr) {
+        return dynamic_cast<const vnnlib::query::TLiteral *>(expr) != nullptr;
+    }
+
+    // True if the variable is a hidden or output node (not an input)
+    bool isHiddenOrOutput(const vnnlib::query::TArithExpr *expr) {
+        auto var = dynamic_cast<const vnnlib::query::TVarExpr *>(expr);
+        return var && (var->symbol->kind == vnnlib::query::SymbolKind::Hidden
+                    || var->symbol->kind == vnnlib::query::SymbolKind::Output);
+    }
+
+    // Level of one comparison: 0 = BND, 1 = OUTC, 2 = LIN, 3 = POLY
+    int comparisonLevel(const vnnlib::query::TCompare *cmp) {
+        const auto *lhs = cmp->lhs.get();
+        const auto *rhs = cmp->rhs.get();
+
+        // Variable against a number, either way round
+        if ((isBareVariable(lhs) && isConstant(rhs)) || (isConstant(lhs) && isBareVariable(rhs))) return 0;
+
+        // Two plain hidden or output variables compared with each other
+        if (isBareVariable(lhs) && isBareVariable(rhs) && isHiddenOrOutput(lhs) && isHiddenOrOutput(rhs)) return 1;
+
+        // Anything else is linear if both sides linearize, otherwise polynomial
+        try {
+            vnnlib::query::linearize(lhs);
+            vnnlib::query::linearize(rhs);
+            return 2;
+        } catch (const vnnlib::query::VNNLibException&) {
+            return 3;
         }
     }
 }
@@ -73,6 +123,37 @@ std::string multipleNodeComparisonsTheory(const TQuery& query) {
 
     // If no assertion has multiple variables in the same network, it is SNC
     return "SNC";
+}
+
+std::string arithmeticComplexityTheory(const TQuery& query) {
+    static const char* names[] = {"BND", "OUTC", "LIN", "POLY"};
+    int highest = 0;
+
+    for (const auto& assertion : query.assertions) {
+        std::vector<const TCompare *> comparisons;
+        getComparisons(assertion.get(), comparisons);
+
+        for (const TCompare *cmp : comparisons) {
+            int level = comparisonLevel(cmp);
+            if (level > highest) highest = level;
+            // POLY is the top level, nothing can beat it
+            if (highest == 3) return names[3];
+        }
+    }
+    return names[highest];
+}
+
+std::vector<std::string> elementTypeTheories(const TQuery& query) {
+    // A set so each element type appears once, in a fixed order
+    std::set<std::string> found;
+
+    for (const auto& network : query.networks) {
+        if (!network) continue;
+        for (const auto& decl : network->inputs)  found.insert(dtypeToString(decl->symbol->dtype));
+        for (const auto& decl : network->hidden)  found.insert(dtypeToString(decl->symbol->dtype));
+        for (const auto& decl : network->outputs) found.insert(dtypeToString(decl->symbol->dtype));
+    }
+    return std::vector<std::string>(found.begin(), found.end());
 }
 
 std::unique_ptr<TQuery> parseQueryFile(std::string path) {

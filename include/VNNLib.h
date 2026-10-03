@@ -29,6 +29,8 @@ VNNLIB_API std::string hiddenNodeTheory(const TQuery& query); // NH or H
 VNNLIB_API std::string inputOutputTheory(const TQuery& query); // SIO or MIO
 VNNLIB_API std::string multipleNetworksTheory(const TQuery& query); // SNET, MNET, MINET, or MENET
 VNNLIB_API std::string multipleNodeComparisonsTheory(const TQuery& query); // SNC or MNC
+VNNLIB_API std::string arithmeticComplexityTheory(const TQuery& query); // BND, OUTC, LIN, or POLY
+VNNLIB_API std::vector<std::string> elementTypeTheories(const TQuery& query); // one entry per declared element type
 
 } // namespace vnnlib::query
 

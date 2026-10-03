@@ -1,15 +1,15 @@
 #include "VNNLib.h"
 
 namespace {
-    void getChildren(const vnnlib::query::TNode *node, std::vector<const vnnlib::query::TVarExpr *>& expressions) {
+    void getVariables(const vnnlib::query::TNode *node, std::vector<const vnnlib::query::TVarExpr *>& variables) {
         // Retrieve the children of the current node
         std::vector<const vnnlib::query::TNode *> children;
         node->children(children);
 
         // Recursively go through each child of the current node
         for (const vnnlib::query::TNode *child : children) {
-            if (auto c = dynamic_cast<const vnnlib::query::TVarExpr *>(child)) expressions.push_back(c); //std::cout << child->toString() << ' ' << c->symbol->name << ' ' << typeid(c->indices).name() << '\n';
-            getChildren(child, expressions);
+            if (auto c = dynamic_cast<const vnnlib::query::TVarExpr *>(child)) variables.push_back(c); //std::cout << child->toString() << ' ' << c->symbol->name << ' ' << typeid(c->indices).name() << '\n';
+            getVariables(child, variables);
         }
     }
 }
@@ -57,16 +57,16 @@ std::string multipleNetworksTheory(const TQuery& query) {
 std::string multipleNodeComparisonsTheory(const TQuery& query) {
     // Process each assertion in the query
     for (const auto& assertion : query.assertions) {
-        // Create a vector to hold all the found expressions
-        std::vector<const vnnlib::query::TVarExpr *> expressions;
+        // Create a vector to hold all the found variables
+        std::vector<const vnnlib::query::TVarExpr *> variables;
 
         // Find all variables in the assertion
-        getChildren(assertion.get(), expressions);
+        getVariables(assertion.get(), variables);
 
         // Check every pair of variables in the assertion, and if there are any two which are in the same network it is MNC
-        for (size_t i = 0; i < expressions.size(); i++) {
-            for (size_t j = i + 1; j < expressions.size(); j++) {
-                if (expressions[i]->symbol->name != expressions[j]->symbol->name && expressions[i]->symbol->networkName == expressions[j]->symbol->networkName) return "MNC";
+        for (size_t i = 0; i < variables.size(); i++) {
+            for (size_t j = i + 1; j < variables.size(); j++) {
+                if (variables[i]->symbol->name != variables[j]->symbol->name && variables[i]->symbol->networkName == variables[j]->symbol->networkName) return "MNC";
             }
         }
     }

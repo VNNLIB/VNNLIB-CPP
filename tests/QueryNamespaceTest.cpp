@@ -83,6 +83,7 @@ void testQueryTheories() {
     assert(query::hiddenNodeTheory(*parsed) == "NH");
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "SNET");
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
 
     // Hidden Nodes Theory
     const std::string hidden = R"(
@@ -98,6 +99,7 @@ void testQueryTheories() {
     assert(query::hiddenNodeTheory(*parsed) == "H");
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "SNET");
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
 
     // Multiple Inputs/Outputs Theory
     const std::string multipleInputs = R"(
@@ -113,6 +115,7 @@ void testQueryTheories() {
     assert(query::hiddenNodeTheory(*parsed) == "NH");
     assert(query::inputOutputTheory(*parsed) == "MIO");
     assert(query::multipleNetworksTheory(*parsed) == "SNET");
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
 
     // Multiple Networks Theory
     const std::string snet = R"(
@@ -127,6 +130,7 @@ void testQueryTheories() {
     assert(query::hiddenNodeTheory(*parsed) == "NH");
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "SNET");
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
 
     const std::string mnet = R"(
 (vnnlib-version <2.0>)
@@ -144,6 +148,7 @@ void testQueryTheories() {
     assert(query::hiddenNodeTheory(*parsed) == "NH");
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "MNET");
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
 
     const std::string minet = R"(
 (vnnlib-version <2.0>)
@@ -162,6 +167,7 @@ void testQueryTheories() {
     assert(query::hiddenNodeTheory(*parsed) == "NH");
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "MINET");
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
 
     const std::string menet = R"(
 (vnnlib-version <2.0>)
@@ -180,6 +186,7 @@ void testQueryTheories() {
     assert(query::hiddenNodeTheory(*parsed) == "NH");
     assert(query::inputOutputTheory(*parsed) == "SIO");
     assert(query::multipleNetworksTheory(*parsed) == "MENET");
+    assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
 
     const std::string snc = R"(
 (vnnlib-version <2.0>)
@@ -198,6 +205,9 @@ void testQueryTheories() {
 (assert (== Y[0] A[0]))
 )";
     parsed = query::parseQueryString(snc);
+    assert(query::hiddenNodeTheory(*parsed) == "H");
+    assert(query::inputOutputTheory(*parsed) == "SIO");
+    assert(query::multipleNetworksTheory(*parsed) == "MNET");
     assert(query::multipleNodeComparisonsTheory(*parsed) == "SNC");
 
     const std::string mnc = R"(
@@ -216,6 +226,9 @@ void testQueryTheories() {
 (assert (== B[0] H[0]))
 )";
     parsed = query::parseQueryString(mnc);
+    assert(query::hiddenNodeTheory(*parsed) == "H");
+    assert(query::inputOutputTheory(*parsed) == "SIO");
+    assert(query::multipleNetworksTheory(*parsed) == "MNET");
     assert(query::multipleNodeComparisonsTheory(*parsed) == "MNC");
 }
 

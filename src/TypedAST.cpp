@@ -327,17 +327,25 @@ std::vector<TMultipleNetworks> TQuery::multipleNetworksTheory() {
 std::vector<TMultipleNodeComparisons> TQuery::multipleNodeComparisonsTheory() {
     // Process each assertion in the query
     for (const auto& assertion : assertions) {
-        // Create a vector to hold all the found variables
-        std::vector<const vnnlib::query::TVarExpr *> variables;
+        // Create a vector to hold all the comparisons in the assertion
+        std::vector<const vnnlib::query::TCompare *> comparisons;
 
-        // Find all variables in the assertion
-        getVariables(assertion.get(), variables);
+        // Find all the comparisons in the assertion
+        getComparisons(assertion.get(), comparisons);
 
-        // Check every pair of variables in the assertion, and if there are any two which are in the same network it is MNC
-        for (size_t i = 0; i < variables.size(); i++) {
-            for (size_t j = i + 1; j < variables.size(); j++) {
-                if (variables[i]->symbol->name != variables[j]->symbol->name && variables[i]->symbol->networkName == variables[j]->symbol->networkName) 
-                    return std::vector<TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::MNC};
+        // Identify the variables in each comparison
+        for (const vnnlib::query::TCompare *comparison : comparisons) {
+            std::vector<const vnnlib::query::TVarExpr *> variables;
+
+            // Find all variables in the comparison
+            getVariables(comparison, variables);
+
+            // Check every pair of variables in the assertion, and if there are any two which are in the same network it is MNC
+            for (size_t i = 0; i < variables.size(); i++) {
+                for (size_t j = i + 1; j < variables.size(); j++) {
+                    if (variables[i]->symbol->name != variables[j]->symbol->name && variables[i]->symbol->networkName == variables[j]->symbol->networkName) 
+                        return std::vector<TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::MNC};
+                }
             }
         }
     }
@@ -351,11 +359,11 @@ TArithmeticComplexity TQuery::arithmeticComplexityTheory() {
     int highest = 0;
 
     for (const auto& assertion : assertions) {
-        std::vector<const TCompare *> comparisons;
+        std::vector<const vnnlib::query::TCompare *> comparisons;
         getComparisons(assertion.get(), comparisons);
 
-        for (const TCompare *cmp : comparisons) {
-            int level = comparisonLevel(cmp);
+        for (const vnnlib::query::TCompare *comparison : comparisons) {
+            int level = comparisonLevel(comparison);
             if (level > highest) highest = level;
             // POLY is the top level, nothing can beat it
             if (highest == 3) return names[3];

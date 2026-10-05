@@ -18,7 +18,7 @@ namespace vnnlib::query {
 using Shape = std::vector<int64_t>;
 using Indices = std::vector<int64_t>;
 
-// Support Theory Sets
+// Supported Theory Sets
 enum class THiddenNode {
 	NH,
 	H

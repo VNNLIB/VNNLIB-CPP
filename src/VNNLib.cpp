@@ -1,8 +1,7 @@
 #include "VNNLib.h"
-#include "LinearArithExpr.h"
-#include <set>
 
 namespace vnnlib::query {
+
 std::unique_ptr<TQuery> parseQueryFile(std::string path) {
     FILE *file = fopen(path.c_str(), "r");
     if (!file) {

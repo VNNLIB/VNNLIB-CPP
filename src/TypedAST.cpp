@@ -282,26 +282,28 @@ namespace {
     }
 }
 
-THiddenNode TQuery::hiddenNodeTheory() {
+std::vector<THiddenNode> TQuery::hiddenNodeTheory() {
     for (const auto& network : networks) {
         // A declaration counts even when no assertion mentions the hidden node.
-        if (network && !network->hidden.empty()) return vnnlib::query::THiddenNode::H;
+        if (network && !network->hidden.empty()) 
+            return std::vector<vnnlib::query::THiddenNode>{vnnlib::query::THiddenNode::H};
     }
-    return vnnlib::query::THiddenNode::NH;
+    return std::vector<vnnlib::query::THiddenNode>{vnnlib::query::THiddenNode::NH, vnnlib::query::THiddenNode::H};
 }
 
-TInputOutput TQuery::inputOutputTheory() {
+std::vector<TInputOutput> TQuery::inputOutputTheory() {
     for (const auto& network : networks) {
         // Count declared nodes, not tensor elements or assertion references.
         if (network && (network->inputs.size() > 1 || network->outputs.size() > 1))
-            return vnnlib::query::TInputOutput::MIO;
+            return std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::MIO};
     }
-    return vnnlib::query::TInputOutput::SIO;
+    return std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO};
 }
 
-TMultipleNetworks TQuery::multipleNetworksTheory() {
+std::vector<TMultipleNetworks> TQuery::multipleNetworksTheory() {
     // If there is only one network, it is a single network
-    if (networks.size() == 1) return vnnlib::query::TMultipleNetworks::SNET;
+    if (networks.size() == 1) 
+        return std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::SNET, vnnlib::query::TMultipleNetworks::MNET};
 
     // Count the number of networks with equal-to or isomorphic-to declarations
     int equalCount = 0, isomorphicCount = 0;
@@ -311,16 +313,18 @@ TMultipleNetworks TQuery::multipleNetworksTheory() {
     }
 
     // If there are multiple network declarations and all but one contains an equal-to, it is MENET
-    if (equalCount == static_cast<int>(networks.size()) - 1) return vnnlib::query::TMultipleNetworks::MENET;
+    if (equalCount == static_cast<int>(networks.size()) - 1) 
+        return std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::MENET, vnnlib::query::TMultipleNetworks::MINET, vnnlib::query::TMultipleNetworks::MNET};
 
     // If there are multiple network declarations and all but one contains an isomorphic-to, it is MINET
-    if (isomorphicCount == static_cast<int>(networks.size()) - 1) return vnnlib::query::TMultipleNetworks::MINET;
+    if (isomorphicCount == static_cast<int>(networks.size()) - 1) 
+        return std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::MINET, vnnlib::query::TMultipleNetworks::MNET};
 
     // If the network does not match any of the other sets, it is MNET
-    return vnnlib::query::TMultipleNetworks::MNET;
+    return std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::MNET};
 }
 
-TMultipleNodeComparisons TQuery::multipleNodeComparisonsTheory() {
+std::vector<TMultipleNodeComparisons> TQuery::multipleNodeComparisonsTheory() {
     // Process each assertion in the query
     for (const auto& assertion : assertions) {
         // Create a vector to hold all the found variables
@@ -332,13 +336,14 @@ TMultipleNodeComparisons TQuery::multipleNodeComparisonsTheory() {
         // Check every pair of variables in the assertion, and if there are any two which are in the same network it is MNC
         for (size_t i = 0; i < variables.size(); i++) {
             for (size_t j = i + 1; j < variables.size(); j++) {
-                if (variables[i]->symbol->name != variables[j]->symbol->name && variables[i]->symbol->networkName == variables[j]->symbol->networkName) return vnnlib::query::TMultipleNodeComparisons::MNC;
+                if (variables[i]->symbol->name != variables[j]->symbol->name && variables[i]->symbol->networkName == variables[j]->symbol->networkName) 
+                    return std::vector<TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::MNC};
             }
         }
     }
 
     // If no assertion has multiple variables in the same network, it is SNC
-    return vnnlib::query::TMultipleNodeComparisons::SNC;
+    return std::vector<TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC};
 }
 
 TArithmeticComplexity TQuery::arithmeticComplexityTheory() {
@@ -363,7 +368,7 @@ std::vector<TDataType> TQuery::elementTypeTheories() {
     // A set so each element type appears once, in a fixed order
     std::set<vnnlib::query::TDataType> found;
 
-    for (const auto& network : this->networks) {
+    for (const auto& network : networks) {
         if (!network) continue;
         for (const auto& decl : network->inputs)  found.insert(decl->symbol->dtype);
         for (const auto& decl : network->hidden)  found.insert(decl->symbol->dtype);

@@ -1,7 +1,7 @@
 #define VNNLIB_NO_DEPRECATED_QUERY_API
 #include "TypedAST.h"  
-#include "LinearArithExpr.h"
 #include <set>
+#include <algorithm>
 
 namespace vnnlib::query {
 
@@ -248,9 +248,11 @@ namespace {
         return dynamic_cast<const vnnlib::query::TVarExpr *>(expr) != nullptr;
     }
 
-    // True if the expression is just a number
+    // True if the expression is a number, including a negated number like (- 1.0)
     bool isConstant(const vnnlib::query::TArithExpr *expr) {
-        return dynamic_cast<const vnnlib::query::TLiteral *>(expr) != nullptr;
+        if (dynamic_cast<const vnnlib::query::TLiteral *>(expr)) return true;
+        if (auto neg = dynamic_cast<const vnnlib::query::TNegate *>(expr)) return isConstant(neg->expr.get());
+        return false;
     }
 
     // True if the variable is a hidden or output node (not an input)
@@ -260,25 +262,46 @@ namespace {
                     || var->symbol->kind == vnnlib::query::SymbolKind::Output);
     }
 
-    // Level of one comparison: 0 = BND, 1 = OUTC, 2 = LIN, 3 = POLY
-    int comparisonLevel(const vnnlib::query::TCompare *cmp) {
+    // Polynomial degree of an expression: numbers are 0, variables are 1,
+    // plus and minus take the largest of their parts, multiply adds its parts.
+    // Purely structural, so no coefficient is ever rounded away.
+    int degree(const vnnlib::query::TArithExpr *expr) {
+        if (dynamic_cast<const vnnlib::query::TLiteral *>(expr)) return 0;
+        if (dynamic_cast<const vnnlib::query::TVarExpr *>(expr)) return 1;
+        if (auto neg = dynamic_cast<const vnnlib::query::TNegate *>(expr)) return degree(neg->expr.get());
+        if (auto plus = dynamic_cast<const vnnlib::query::TPlus *>(expr)) {
+            int highest = 0;
+            for (const auto& arg : plus->args) highest = std::max(highest, degree(arg.get()));
+            return highest;
+        }
+        if (auto minus = dynamic_cast<const vnnlib::query::TMinus *>(expr)) {
+            int highest = degree(minus->head.get());
+            for (const auto& arg : minus->rest) highest = std::max(highest, degree(arg.get()));
+            return highest;
+        }
+        if (auto mul = dynamic_cast<const vnnlib::query::TMultiply *>(expr)) {
+            int total = 0;
+            for (const auto& arg : mul->args) total += degree(arg.get());
+            return total;
+        }
+        return 1;
+    }
+
+    // The arithmetic complexity of a single comparison
+    vnnlib::query::TArithmeticComplexity comparisonComplexity(const vnnlib::query::TCompare *cmp) {
         const auto *lhs = cmp->lhs.get();
         const auto *rhs = cmp->rhs.get();
 
-        // Variable against a number, either way round
-        if ((isBareVariable(lhs) && isConstant(rhs)) || (isConstant(lhs) && isBareVariable(rhs))) return 0;
+        if ((isBareVariable(lhs) && isConstant(rhs)) || (isConstant(lhs) && isBareVariable(rhs)))
+            return vnnlib::query::TArithmeticComplexity::BND;
 
-        // Two plain hidden or output variables compared with each other
-        if (isBareVariable(lhs) && isBareVariable(rhs) && isHiddenOrOutput(lhs) && isHiddenOrOutput(rhs)) return 1;
+        if (isBareVariable(lhs) && isBareVariable(rhs) && isHiddenOrOutput(lhs) && isHiddenOrOutput(rhs))
+            return vnnlib::query::TArithmeticComplexity::OUTC;
 
-        // Anything else is linear if both sides linearize, otherwise polynomial
-        try {
-            vnnlib::query::linearize(lhs);
-            vnnlib::query::linearize(rhs);
-            return 2;
-        } catch (const vnnlib::query::VNNLibException&) {
-            return 3;
-        }
+        if (degree(lhs) <= 1 && degree(rhs) <= 1)
+            return vnnlib::query::TArithmeticComplexity::LIN;
+
+        return vnnlib::query::TArithmeticComplexity::POLY;
     }
 }
 
@@ -354,22 +377,24 @@ std::vector<TMultipleNodeComparisons> TQuery::multipleNodeComparisonsTheory() {
     return std::vector<TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC};
 }
 
-TArithmeticComplexity TQuery::arithmeticComplexityTheory() {
-    static const vnnlib::query::TArithmeticComplexity names[] = {vnnlib::query::TArithmeticComplexity::BND, vnnlib::query::TArithmeticComplexity::OUTC, vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY};
-    int highest = 0;
-
+std::vector<TArithmeticComplexity> TQuery::arithmeticComplexityTheory() {
+    // Find the most complex comparison in the query
+    vnnlib::query::TArithmeticComplexity highest = vnnlib::query::TArithmeticComplexity::BND;
     for (const auto& assertion : assertions) {
         std::vector<const vnnlib::query::TCompare *> comparisons;
         getComparisons(assertion.get(), comparisons);
-
-        for (const vnnlib::query::TCompare *comparison : comparisons) {
-            int level = comparisonLevel(comparison);
-            if (level > highest) highest = level;
-            // POLY is the top level, nothing can beat it
-            if (highest == 3) return names[3];
-        }
+        for (const vnnlib::query::TCompare *comparison : comparisons)
+            highest = std::max(highest, comparisonComplexity(comparison));
     }
-    return names[highest];
+
+    // The query belongs to that theory and every larger one, since BND is a subset of OUTC and so on
+    static const vnnlib::query::TArithmeticComplexity order[] = {
+        vnnlib::query::TArithmeticComplexity::BND, vnnlib::query::TArithmeticComplexity::OUTC,
+        vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY};
+    std::vector<vnnlib::query::TArithmeticComplexity> theories;
+    for (auto theory : order)
+        if (theory >= highest) theories.push_back(theory);
+    return theories;
 }
 
 std::vector<TDataType> TQuery::elementTypeTheories() {

@@ -294,7 +294,7 @@ public:
 	std::vector<TInputOutput> inputOutputTheory();
 	std::vector<TMultipleNetworks> multipleNetworksTheory();
 	std::vector<TMultipleNodeComparisons> multipleNodeComparisonsTheory();
-	TArithmeticComplexity arithmeticComplexityTheory();
+	std::vector<TArithmeticComplexity> arithmeticComplexityTheory();
 	std::vector<TDataType> elementTypeTheories();
 	void children(std::vector<const TNode*>& out) const override;
 	std::string toString() const override;

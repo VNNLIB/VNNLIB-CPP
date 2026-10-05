@@ -2,6 +2,7 @@
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 #include "VNNLib.h"
 
@@ -22,7 +23,7 @@ void testHiddenNodeTheory() {
     assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
     assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::SNET, vnnlib::query::TMultipleNetworks::MNET}));
     assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::BND);
+    assert((parsed->arithmeticComplexityTheory() == std::vector<vnnlib::query::TArithmeticComplexity>{vnnlib::query::TArithmeticComplexity::BND, vnnlib::query::TArithmeticComplexity::OUTC, vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY}));
     assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::F32}));
     
     const std::string h = R"(
@@ -39,7 +40,7 @@ void testHiddenNodeTheory() {
     assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
     assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::SNET, vnnlib::query::TMultipleNetworks::MNET}));
     assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::BND);
+    assert((parsed->arithmeticComplexityTheory() == std::vector<vnnlib::query::TArithmeticComplexity>{vnnlib::query::TArithmeticComplexity::BND, vnnlib::query::TArithmeticComplexity::OUTC, vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY}));
     assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::F32}));
 }
 
@@ -57,7 +58,7 @@ void testMultipleInputOutputTheory() {
     assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
     assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::SNET, vnnlib::query::TMultipleNetworks::MNET}));
     assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::BND);
+    assert((parsed->arithmeticComplexityTheory() == std::vector<vnnlib::query::TArithmeticComplexity>{vnnlib::query::TArithmeticComplexity::BND, vnnlib::query::TArithmeticComplexity::OUTC, vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY}));
     assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::F32}));
 
     const std::string mio = R"(
@@ -74,7 +75,7 @@ void testMultipleInputOutputTheory() {
     assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::MIO}));
     assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::SNET, vnnlib::query::TMultipleNetworks::MNET}));
     assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::BND);
+    assert((parsed->arithmeticComplexityTheory() == std::vector<vnnlib::query::TArithmeticComplexity>{vnnlib::query::TArithmeticComplexity::BND, vnnlib::query::TArithmeticComplexity::OUTC, vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY}));
     assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::F32}));
 }
 
@@ -92,7 +93,7 @@ void testMultipleNetworksTheory() {
     assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
     assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::SNET, vnnlib::query::TMultipleNetworks::MNET}));
     assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::BND);
+    assert((parsed->arithmeticComplexityTheory() == std::vector<vnnlib::query::TArithmeticComplexity>{vnnlib::query::TArithmeticComplexity::BND, vnnlib::query::TArithmeticComplexity::OUTC, vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY}));
     assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::F32}));
 
     const std::string mnet = R"(
@@ -112,7 +113,7 @@ void testMultipleNetworksTheory() {
     assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
     assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::MNET}));
     assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::BND);
+    assert((parsed->arithmeticComplexityTheory() == std::vector<vnnlib::query::TArithmeticComplexity>{vnnlib::query::TArithmeticComplexity::BND, vnnlib::query::TArithmeticComplexity::OUTC, vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY}));
     assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::F32}));
 
     const std::string minet = R"(
@@ -133,7 +134,7 @@ void testMultipleNetworksTheory() {
     assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
     assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::MINET, vnnlib::query::TMultipleNetworks::MNET}));
     assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::BND);
+    assert((parsed->arithmeticComplexityTheory() == std::vector<vnnlib::query::TArithmeticComplexity>{vnnlib::query::TArithmeticComplexity::BND, vnnlib::query::TArithmeticComplexity::OUTC, vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY}));
     assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::F32}));
 
     const std::string menet = R"(
@@ -154,7 +155,7 @@ void testMultipleNetworksTheory() {
     assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
     assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::MENET, vnnlib::query::TMultipleNetworks::MINET, vnnlib::query::TMultipleNetworks::MNET}));
     assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::BND);
+    assert((parsed->arithmeticComplexityTheory() == std::vector<vnnlib::query::TArithmeticComplexity>{vnnlib::query::TArithmeticComplexity::BND, vnnlib::query::TArithmeticComplexity::OUTC, vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY}));
     assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::F32}));
 }
 
@@ -180,7 +181,7 @@ void testMultipleNodeComparisonsTheory() {
     assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
     assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::MNET}));
     assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::LIN);
+    assert((parsed->arithmeticComplexityTheory() == std::vector<vnnlib::query::TArithmeticComplexity>{vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY}));
     assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::F32}));
 
     const std::string mnc = R"(
@@ -203,49 +204,59 @@ void testMultipleNodeComparisonsTheory() {
     assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
     assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::MNET}));
     assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::LIN);
+    assert((parsed->arithmeticComplexityTheory() == std::vector<vnnlib::query::TArithmeticComplexity>{vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY}));
     assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::F32}));
 }
 
-void testArithmeticComplexityTheory() {
-    const std::string net = R"(
+namespace {
+    const std::string arithmeticNet = R"(
 (vnnlib-version <2.0>)
 (declare-network test
     (declare-input X real [2])
     (declare-output Y real [2])
 )
 )";
-    auto parsed = query::parseQueryString(net + "(assert (<= X[0] 1.0))\n(assert (>= Y[0] 0.5))");
-    assert((parsed->hiddenNodeTheory() == std::vector<vnnlib::query::THiddenNode>{vnnlib::query::THiddenNode::NH, vnnlib::query::THiddenNode::H}));
-    assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
-    assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::SNET, vnnlib::query::TMultipleNetworks::MNET}));
-    assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::BND);
-    assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::Real}));
 
-    parsed = query::parseQueryString(net + "(assert (<= X[0] 1.0))\n(assert (>= Y[0] Y[1]))");
-    assert((parsed->hiddenNodeTheory() == std::vector<vnnlib::query::THiddenNode>{vnnlib::query::THiddenNode::NH, vnnlib::query::THiddenNode::H}));
-    assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
-    assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::SNET, vnnlib::query::TMultipleNetworks::MNET}));
-    assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::OUTC);
-    assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::Real}));
+    std::vector<vnnlib::query::TArithmeticComplexity> arithmetic(const std::string& assertions) {
+        return query::parseQueryString(arithmeticNet + assertions)->arithmeticComplexityTheory();
+    }
 
-    parsed = query::parseQueryString(net + "(assert (<= (+ (* 0.5 X[0]) (* 0.75 X[1])) 1.0))\n(assert (>= (+ Y[0] Y[1]) 0.5))");
-    assert((parsed->hiddenNodeTheory() == std::vector<vnnlib::query::THiddenNode>{vnnlib::query::THiddenNode::NH, vnnlib::query::THiddenNode::H}));
-    assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
-    assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::SNET, vnnlib::query::TMultipleNetworks::MNET}));
-    assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::LIN);
-    assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::Real}));
+    using AC = vnnlib::query::TArithmeticComplexity;
+}
 
-    parsed = query::parseQueryString(net + "(assert (<= (* X[0] X[1]) 1.0))\n(assert (>= (+ Y[0] Y[1]) 0.5))");
-    assert((parsed->hiddenNodeTheory() == std::vector<vnnlib::query::THiddenNode>{vnnlib::query::THiddenNode::NH, vnnlib::query::THiddenNode::H}));
-    assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
-    assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::SNET, vnnlib::query::TMultipleNetworks::MNET}));
-    assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::POLY);
-    assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::Real}));
+void testArithmeticBoundsOnly() {
+    assert((arithmetic("(assert (<= X[0] 1.0)) (assert (>= Y[0] 0.5))") == std::vector<AC>{AC::BND, AC::OUTC, AC::LIN, AC::POLY}));
+}
+
+void testArithmeticOutputComparison() {
+    assert((arithmetic("(assert (<= X[0] 1.0)) (assert (>= Y[0] Y[1]))") == std::vector<AC>{AC::OUTC, AC::LIN, AC::POLY}));
+}
+
+void testArithmeticLinear() {
+    assert((arithmetic("(assert (<= (+ (* 0.5 X[0]) (* 0.75 X[1])) 1.0)) (assert (>= (+ Y[0] Y[1]) 0.5))") == std::vector<AC>{AC::LIN, AC::POLY}));
+}
+
+void testArithmeticPolynomial() {
+    assert((arithmetic("(assert (<= (* X[0] X[1]) 1.0)) (assert (>= (+ Y[0] Y[1]) 0.5))") == std::vector<AC>{AC::POLY}));
+}
+
+void testArithmeticHighestLevelWins() {
+    assert((arithmetic("(assert (<= X[0] 1.0)) (assert (<= (* X[0] X[1]) 1.0))") == std::vector<AC>{AC::POLY}));
+}
+
+// A negated number is still a constant, so this is a bound
+void testArithmeticNegatedConstantIsBound() {
+    assert((arithmetic("(assert (>= X[0] (- 1.0)))") == std::vector<AC>{AC::BND, AC::OUTC, AC::LIN, AC::POLY}));
+}
+
+// A tiny coefficient must not hide a product of two variables
+void testArithmeticTinyCoefficientProductIsPolynomial() {
+    assert((arithmetic("(assert (<= (* (* 0.0000000001 X[0]) X[1]) 1.0))") == std::vector<AC>{AC::POLY}));
+}
+
+// Comparisons inside and/or count the same as top-level ones
+void testArithmeticNestedComparison() {
+    assert((arithmetic("(assert (and (<= X[0] 1.0) (>= (+ Y[0] Y[1]) 0.5)))") == std::vector<AC>{AC::LIN, AC::POLY}));
 }
 
 void testElementTypeTheories() {
@@ -262,7 +273,7 @@ void testElementTypeTheories() {
     assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
     assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::SNET, vnnlib::query::TMultipleNetworks::MNET}));
     assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::BND);
+    assert((parsed->arithmeticComplexityTheory() == std::vector<vnnlib::query::TArithmeticComplexity>{vnnlib::query::TArithmeticComplexity::BND, vnnlib::query::TArithmeticComplexity::OUTC, vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY}));
     assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::F16}));
 
     const std::string mixed = R"(
@@ -278,7 +289,7 @@ void testElementTypeTheories() {
     assert((parsed->inputOutputTheory() == std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO}));
     assert((parsed->multipleNetworksTheory() == std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::SNET, vnnlib::query::TMultipleNetworks::MNET}));
     assert((parsed->multipleNodeComparisonsTheory() == std::vector<vnnlib::query::TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC}));
-    assert(parsed->arithmeticComplexityTheory() == vnnlib::query::TArithmeticComplexity::BND);
+    assert((parsed->arithmeticComplexityTheory() == std::vector<vnnlib::query::TArithmeticComplexity>{vnnlib::query::TArithmeticComplexity::BND, vnnlib::query::TArithmeticComplexity::OUTC, vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY}));
     assert((parsed->elementTypeTheories() == std::vector<vnnlib::query::TDataType>{vnnlib::query::TDataType::F16, vnnlib::query::TDataType::F32}));
 }
 } // namespace
@@ -288,6 +299,13 @@ int main() {
     testMultipleInputOutputTheory();
     testMultipleNetworksTheory();
     testMultipleNodeComparisonsTheory();
-    testArithmeticComplexityTheory();
+    testArithmeticBoundsOnly();
+    testArithmeticOutputComparison();
+    testArithmeticLinear();
+    testArithmeticPolynomial();
+    testArithmeticHighestLevelWins();
+    testArithmeticNegatedConstantIsBound();
+    testArithmeticTinyCoefficientProductIsPolynomial();
+    testArithmeticNestedComparison();
     testElementTypeTheories();
 }

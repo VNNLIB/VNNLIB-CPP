@@ -1,5 +1,7 @@
 #define VNNLIB_NO_DEPRECATED_QUERY_API
 #include "TypedAST.h"  
+#include "LinearArithExpr.h"
+#include <set>
 
 namespace vnnlib::query {
 
@@ -217,6 +219,158 @@ std::string TVersion::toString() const {
 }
 
 // --- Query ---
+
+namespace {
+    void getVariables(const vnnlib::query::TNode *node, std::vector<const vnnlib::query::TVarExpr *>& variables) {
+        // Retrieve the children of the current node
+        std::vector<const vnnlib::query::TNode *> children;
+        node->children(children);
+
+        // Recursively go through each child of the current node
+        for (const vnnlib::query::TNode *child : children) {
+            if (auto c = dynamic_cast<const vnnlib::query::TVarExpr *>(child)) variables.push_back(c);
+            getVariables(child, variables);
+        }
+    }
+
+    // Collect every comparison under a node, including ones nested inside and/or
+    void getComparisons(const vnnlib::query::TNode *node, std::vector<const vnnlib::query::TCompare *>& out) {
+        std::vector<const vnnlib::query::TNode *> children;
+        node->children(children);
+        for (const vnnlib::query::TNode *child : children) {
+            if (auto c = dynamic_cast<const vnnlib::query::TCompare *>(child)) out.push_back(c);
+            getComparisons(child, out);
+        }
+    }
+
+    // True if the expression is just a variable, with nothing done to it
+    bool isBareVariable(const vnnlib::query::TArithExpr *expr) {
+        return dynamic_cast<const vnnlib::query::TVarExpr *>(expr) != nullptr;
+    }
+
+    // True if the expression is just a number
+    bool isConstant(const vnnlib::query::TArithExpr *expr) {
+        return dynamic_cast<const vnnlib::query::TLiteral *>(expr) != nullptr;
+    }
+
+    // True if the variable is a hidden or output node (not an input)
+    bool isHiddenOrOutput(const vnnlib::query::TArithExpr *expr) {
+        auto var = dynamic_cast<const vnnlib::query::TVarExpr *>(expr);
+        return var && (var->symbol->kind == vnnlib::query::SymbolKind::Hidden
+                    || var->symbol->kind == vnnlib::query::SymbolKind::Output);
+    }
+
+    // Level of one comparison: 0 = BND, 1 = OUTC, 2 = LIN, 3 = POLY
+    int comparisonLevel(const vnnlib::query::TCompare *cmp) {
+        const auto *lhs = cmp->lhs.get();
+        const auto *rhs = cmp->rhs.get();
+
+        // Variable against a number, either way round
+        if ((isBareVariable(lhs) && isConstant(rhs)) || (isConstant(lhs) && isBareVariable(rhs))) return 0;
+
+        // Two plain hidden or output variables compared with each other
+        if (isBareVariable(lhs) && isBareVariable(rhs) && isHiddenOrOutput(lhs) && isHiddenOrOutput(rhs)) return 1;
+
+        // Anything else is linear if both sides linearize, otherwise polynomial
+        try {
+            vnnlib::query::linearize(lhs);
+            vnnlib::query::linearize(rhs);
+            return 2;
+        } catch (const vnnlib::query::VNNLibException&) {
+            return 3;
+        }
+    }
+}
+
+THiddenNode TQuery::hiddenNodeTheory() {
+    for (const auto& network : networks) {
+        // A declaration counts even when no assertion mentions the hidden node.
+        if (network && !network->hidden.empty()) return vnnlib::query::THiddenNode::H;
+    }
+    return vnnlib::query::THiddenNode::NH;
+}
+
+TInputOutput TQuery::inputOutputTheory() {
+    for (const auto& network : networks) {
+        // Count declared nodes, not tensor elements or assertion references.
+        if (network && (network->inputs.size() > 1 || network->outputs.size() > 1))
+            return vnnlib::query::TInputOutput::MIO;
+    }
+    return vnnlib::query::TInputOutput::SIO;
+}
+
+TMultipleNetworks TQuery::multipleNetworksTheory() {
+    // If there is only one network, it is a single network
+    if (networks.size() == 1) return vnnlib::query::TMultipleNetworks::SNET;
+
+    // Count the number of networks with equal-to or isomorphic-to declarations
+    int equalCount = 0, isomorphicCount = 0;
+    for (const auto& network : networks) {
+        if (!network->equalTo.empty()) equalCount++;
+        if (!network->isometricTo.empty() || !network->equalTo.empty()) isomorphicCount++;
+    }
+
+    // If there are multiple network declarations and all but one contains an equal-to, it is MENET
+    if (equalCount == static_cast<int>(networks.size()) - 1) return vnnlib::query::TMultipleNetworks::MENET;
+
+    // If there are multiple network declarations and all but one contains an isomorphic-to, it is MINET
+    if (isomorphicCount == static_cast<int>(networks.size()) - 1) return vnnlib::query::TMultipleNetworks::MINET;
+
+    // If the network does not match any of the other sets, it is MNET
+    return vnnlib::query::TMultipleNetworks::MNET;
+}
+
+TMultipleNodeComparisons TQuery::multipleNodeComparisonsTheory() {
+    // Process each assertion in the query
+    for (const auto& assertion : assertions) {
+        // Create a vector to hold all the found variables
+        std::vector<const vnnlib::query::TVarExpr *> variables;
+
+        // Find all variables in the assertion
+        getVariables(assertion.get(), variables);
+
+        // Check every pair of variables in the assertion, and if there are any two which are in the same network it is MNC
+        for (size_t i = 0; i < variables.size(); i++) {
+            for (size_t j = i + 1; j < variables.size(); j++) {
+                if (variables[i]->symbol->name != variables[j]->symbol->name && variables[i]->symbol->networkName == variables[j]->symbol->networkName) return vnnlib::query::TMultipleNodeComparisons::MNC;
+            }
+        }
+    }
+
+    // If no assertion has multiple variables in the same network, it is SNC
+    return vnnlib::query::TMultipleNodeComparisons::SNC;
+}
+
+TArithmeticComplexity TQuery::arithmeticComplexityTheory() {
+    static const vnnlib::query::TArithmeticComplexity names[] = {vnnlib::query::TArithmeticComplexity::BND, vnnlib::query::TArithmeticComplexity::OUTC, vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY};
+    int highest = 0;
+
+    for (const auto& assertion : assertions) {
+        std::vector<const TCompare *> comparisons;
+        getComparisons(assertion.get(), comparisons);
+
+        for (const TCompare *cmp : comparisons) {
+            int level = comparisonLevel(cmp);
+            if (level > highest) highest = level;
+            // POLY is the top level, nothing can beat it
+            if (highest == 3) return names[3];
+        }
+    }
+    return names[highest];
+}
+
+std::vector<TDataType> TQuery::elementTypeTheories() {
+    // A set so each element type appears once, in a fixed order
+    std::set<vnnlib::query::TDataType> found;
+
+    for (const auto& network : this->networks) {
+        if (!network) continue;
+        for (const auto& decl : network->inputs)  found.insert(decl->symbol->dtype);
+        for (const auto& decl : network->hidden)  found.insert(decl->symbol->dtype);
+        for (const auto& decl : network->outputs) found.insert(decl->symbol->dtype);
+    }
+    return std::vector<vnnlib::query::TDataType>(found.begin(), found.end());
+}
 
 void TQuery::children(std::vector<const TNode*>& out) const {
 	for (auto const& n : networks)   if (n) out.push_back(n.get());

@@ -319,7 +319,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
             "${CMAKE_CURRENT_BINARY_DIR}/query_namespace.vnnlib")
 
         # Keep runtime assertions active in Release CI builds too.
-        foreach(query_test IN ITEMS QueryNamespaceTest QueryCompatibilityTest QueryFileTest)
+        foreach(query_test IN ITEMS QueryNamespaceTests QueryCompatibilityTests QueryFileTest)
             if(MSVC)
                 target_compile_options(${query_test} PRIVATE /UNDEBUG)
             else()

@@ -18,6 +18,36 @@ namespace vnnlib::query {
 using Shape = std::vector<int64_t>;
 using Indices = std::vector<int64_t>;
 
+// Supported Theory Sets
+enum class THiddenNode {
+	NH,
+	H
+};
+
+enum class TInputOutput {
+	SIO,
+	MIO
+};
+
+enum class TMultipleNetworks {
+	SNET,
+	MENET,
+	MINET,
+	MNET
+};
+
+enum class TMultipleNodeComparisons {
+	SNC,
+	MNC
+};
+
+enum class TArithmeticComplexity {
+	BND,
+	OUTC,
+	LIN,
+	POLY
+};
+
 // Supported Data Types
 enum class TDataType {
 	Real,
@@ -260,6 +290,12 @@ public:
 	std::unique_ptr<TVersion> version{};
 	std::vector<std::unique_ptr<TNetworkDefinition>> networks{};
 	std::vector<std::unique_ptr<TAssertion>> assertions{};
+	std::vector<THiddenNode> hiddenNodeTheory();
+	std::vector<TInputOutput> inputOutputTheory();
+	std::vector<TMultipleNetworks> multipleNetworksTheory();
+	std::vector<TMultipleNodeComparisons> multipleNodeComparisonsTheory();
+	std::vector<TArithmeticComplexity> arithmeticComplexityTheory();
+	std::vector<TDataType> elementTypeTheories();
 	void children(std::vector<const TNode*>& out) const override;
 	std::string toString() const override;
 protected:

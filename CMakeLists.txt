@@ -301,13 +301,17 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
     if(BUILD_TESTING)
         # Query namespace tests
-        add_executable(QueryNamespaceTest tests/QueryNamespaceTest.cpp)
-        target_link_libraries(QueryNamespaceTest PRIVATE VNNLib)
-        add_test(NAME QueryNamespaceTest COMMAND QueryNamespaceTest)
+        add_executable(QueryNamespaceTests tests/QueryNamespaceTests.cpp)
+        target_link_libraries(QueryNamespaceTests PRIVATE VNNLib)
+        add_test(NAME QueryNamespaceTests COMMAND QueryNamespaceTests)
 
-        add_executable(QueryCompatibilityTest tests/QueryCompatibilityTest.cpp)
-        target_link_libraries(QueryCompatibilityTest PRIVATE VNNLib)
-        add_test(NAME QueryCompatibilityTest COMMAND QueryCompatibilityTest)
+        add_executable(QueryCompatibilityTests tests/QueryCompatibilityTests.cpp)
+        target_link_libraries(QueryCompatibilityTests PRIVATE VNNLib)
+        add_test(NAME QueryCompatibilityTests COMMAND QueryCompatibilityTests)
+
+        add_executable(QueryTheoryTests tests/QueryTheoryTests.cpp)
+        target_link_libraries(QueryTheoryTests PRIVATE VNNLib)
+        add_test(NAME QueryTheoryTests COMMAND QueryTheoryTests)
 
         add_executable(QueryFileTest tests/QueryFileTest.cpp)
         target_link_libraries(QueryFileTest PRIVATE VNNLib)

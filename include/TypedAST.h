@@ -290,11 +290,11 @@ public:
 	std::unique_ptr<TVersion> version{};
 	std::vector<std::unique_ptr<TNetworkDefinition>> networks{};
 	std::vector<std::unique_ptr<TAssertion>> assertions{};
-	std::vector<THiddenNode> hiddenNodeTheory();
-	std::vector<TInputOutput> inputOutputTheory();
-	std::vector<TMultipleNetworks> multipleNetworksTheory();
-	std::vector<TMultipleNodeComparisons> multipleNodeComparisonsTheory();
-	std::vector<TArithmeticComplexity> arithmeticComplexityTheory();
+	THiddenNode hiddenNodeTheory();
+	TInputOutput inputOutputTheory();
+	TMultipleNetworks multipleNetworksTheory();
+	TMultipleNodeComparisons multipleNodeComparisonsTheory();
+	TArithmeticComplexity arithmeticComplexityTheory();
 	std::vector<TDataType> elementTypeTheories();
 	void children(std::vector<const TNode*>& out) const override;
 	std::string toString() const override;

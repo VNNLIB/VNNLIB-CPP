@@ -305,28 +305,28 @@ namespace {
     }
 }
 
-std::vector<THiddenNode> TQuery::hiddenNodeTheory() {
+THiddenNode TQuery::hiddenNodeTheory() {
     for (const auto& network : networks) {
         // A declaration counts even when no assertion mentions the hidden node.
         if (network && !network->hidden.empty()) 
-            return std::vector<vnnlib::query::THiddenNode>{vnnlib::query::THiddenNode::H};
+            return vnnlib::query::THiddenNode::H;
     }
-    return std::vector<vnnlib::query::THiddenNode>{vnnlib::query::THiddenNode::NH, vnnlib::query::THiddenNode::H};
+    return vnnlib::query::THiddenNode::NH;
 }
 
-std::vector<TInputOutput> TQuery::inputOutputTheory() {
+TInputOutput TQuery::inputOutputTheory() {
     for (const auto& network : networks) {
         // Count declared nodes, not tensor elements or assertion references.
         if (network && (network->inputs.size() > 1 || network->outputs.size() > 1))
-            return std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::MIO};
+            return vnnlib::query::TInputOutput::MIO;
     }
-    return std::vector<vnnlib::query::TInputOutput>{vnnlib::query::TInputOutput::SIO, vnnlib::query::TInputOutput::MIO};
+    return vnnlib::query::TInputOutput::SIO;
 }
 
-std::vector<TMultipleNetworks> TQuery::multipleNetworksTheory() {
+TMultipleNetworks TQuery::multipleNetworksTheory() {
     // If there is only one network, it is a single network
     if (networks.size() == 1) 
-        return std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::SNET, vnnlib::query::TMultipleNetworks::MNET};
+        return vnnlib::query::TMultipleNetworks::SNET;
 
     // Count the number of networks with equal-to or isomorphic-to declarations
     int equalCount = 0, isomorphicCount = 0;
@@ -337,17 +337,17 @@ std::vector<TMultipleNetworks> TQuery::multipleNetworksTheory() {
 
     // If there are multiple network declarations and all but one contains an equal-to, it is MENET
     if (equalCount == static_cast<int>(networks.size()) - 1) 
-        return std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::MENET, vnnlib::query::TMultipleNetworks::MINET, vnnlib::query::TMultipleNetworks::MNET};
+        return vnnlib::query::TMultipleNetworks::MENET;
 
     // If there are multiple network declarations and all but one contains an isomorphic-to, it is MINET
     if (isomorphicCount == static_cast<int>(networks.size()) - 1) 
-        return std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::MINET, vnnlib::query::TMultipleNetworks::MNET};
+        return vnnlib::query::TMultipleNetworks::MINET;
 
     // If the network does not match any of the other sets, it is MNET
-    return std::vector<vnnlib::query::TMultipleNetworks>{vnnlib::query::TMultipleNetworks::MNET};
+    return vnnlib::query::TMultipleNetworks::MNET;
 }
 
-std::vector<TMultipleNodeComparisons> TQuery::multipleNodeComparisonsTheory() {
+TMultipleNodeComparisons TQuery::multipleNodeComparisonsTheory() {
     // Process each assertion in the query
     for (const auto& assertion : assertions) {
         // Create a vector to hold all the comparisons in the assertion
@@ -367,17 +367,17 @@ std::vector<TMultipleNodeComparisons> TQuery::multipleNodeComparisonsTheory() {
             for (size_t i = 0; i < variables.size(); i++) {
                 for (size_t j = i + 1; j < variables.size(); j++) {
                     if (variables[i]->symbol->name != variables[j]->symbol->name && variables[i]->symbol->networkName == variables[j]->symbol->networkName) 
-                        return std::vector<TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::MNC};
+                        return vnnlib::query::TMultipleNodeComparisons::MNC;
                 }
             }
         }
     }
 
     // If no assertion has multiple variables in the same network, it is SNC
-    return std::vector<TMultipleNodeComparisons>{vnnlib::query::TMultipleNodeComparisons::SNC, vnnlib::query::TMultipleNodeComparisons::MNC};
+    return vnnlib::query::TMultipleNodeComparisons::SNC;
 }
 
-std::vector<TArithmeticComplexity> TQuery::arithmeticComplexityTheory() {
+TArithmeticComplexity TQuery::arithmeticComplexityTheory() {
     // Find the most complex comparison in the query
     vnnlib::query::TArithmeticComplexity highest = vnnlib::query::TArithmeticComplexity::BND;
     for (const auto& assertion : assertions) {
@@ -387,14 +387,7 @@ std::vector<TArithmeticComplexity> TQuery::arithmeticComplexityTheory() {
             highest = std::max(highest, comparisonComplexity(comparison));
     }
 
-    // The query belongs to that theory and every larger one, since BND is a subset of OUTC and so on
-    static const vnnlib::query::TArithmeticComplexity order[] = {
-        vnnlib::query::TArithmeticComplexity::BND, vnnlib::query::TArithmeticComplexity::OUTC,
-        vnnlib::query::TArithmeticComplexity::LIN, vnnlib::query::TArithmeticComplexity::POLY};
-    std::vector<vnnlib::query::TArithmeticComplexity> theories;
-    for (auto theory : order)
-        if (theory >= highest) theories.push_back(theory);
-    return theories;
+    return highest;
 }
 
 std::vector<TDataType> TQuery::elementTypeTheories() {

@@ -86,6 +86,8 @@ foreach(mode IN ITEMS old new)
         "add_library(probe OBJECT probe.cpp)\n"
         "target_include_directories(probe PRIVATE \"${SOURCE_DIR}/include\" \"${SOURCE_DIR}/include/util\" \"${SOURCE_DIR}/src/generated\")\n"
         "if(MSVC)\n"
+        # Match the main build's CRT settings without suppressing API deprecations.
+        "  target_compile_definitions(probe PRIVATE _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS)\n"
         "  target_compile_options(probe PRIVATE ${msvc_options})\n"
         "else()\n"
         "  target_compile_options(probe PRIVATE ${options})\n"

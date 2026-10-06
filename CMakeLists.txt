@@ -60,82 +60,50 @@ if(BNFC)
 
     set(BNFC_INPUT ${CMAKE_CURRENT_SOURCE_DIR}/grammar/syntax/grammar.cf)
 
-    add_custom_command(
-        OUTPUT
-            ${GENERATED_DIR}/Absyn.C
-            ${GENERATED_DIR}/Absyn.H
-            ${GENERATED_DIR}/Printer.C
-            ${GENERATED_DIR}/Printer.H
-            ${GENERATED_DIR}/Buffer.C
-            ${GENERATED_DIR}/Buffer.H
-            ${GENERATED_DIR}/grammar.y
-            ${GENERATED_DIR}/grammar.l
-            ${GENERATED_DIR}/Parser.H
-            ${GENERATED_DIR}/ParserError.H
-            ${GENERATED_DIR}/Skeleton.C
-            ${GENERATED_DIR}/Skeleton.H
-            ${GENERATED_DIR}/Test.C
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${GENERATED_DIR}
-        COMMAND ${BNFC_EXECUTABLE} --cpp -o ${GENERATED_DIR} ${BNFC_INPUT}
-        DEPENDS ${BNFC_INPUT}
-        COMMENT "Running BNFC on ${BNFC_INPUT}"
-        VERBATIM
-    )
-
-    add_custom_target(BNFCGen
-        DEPENDS
-            ${GENERATED_DIR}/Absyn.C
-            ${GENERATED_DIR}/Absyn.H
-            ${GENERATED_DIR}/Printer.C
-            ${GENERATED_DIR}/Printer.H
-            ${GENERATED_DIR}/Buffer.C
-            ${GENERATED_DIR}/Buffer.H
-            ${GENERATED_DIR}/grammar.y
-            ${GENERATED_DIR}/grammar.l
-            ${GENERATED_DIR}/Parser.H
-            ${GENERATED_DIR}/ParserError.H
-            ${GENERATED_DIR}/Skeleton.C
-            ${GENERATED_DIR}/Skeleton.H
-            ${GENERATED_DIR}/Test.C
-    )
-
-    # ------------------------------------------------------------
-    # Bison / Flex
-    # ------------------------------------------------------------
-
-    # Configure the patch script with the correct GENERATED_DIR
     configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/cmake/PatchGenerated.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/PatchGenerated.cmake
         @ONLY
     )
 
-    # Custom commands for Bison and Flex
+    # One target owns the whole generation pipeline. Independent Bison/Flex
+    # rules can otherwise run twice when Make builds the library and executable.
+    set(PARSER_GENERATION_STAMP "${CMAKE_CURRENT_BINARY_DIR}/parser-generation.stamp")
     add_custom_command(
-        OUTPUT ${GENERATED_DIR}/Parser.C ${GENERATED_DIR}/Bison.H
+        OUTPUT ${PARSER_GENERATION_STAMP}
+        BYPRODUCTS
+            ${GENERATED_DIR}/Absyn.C
+            ${GENERATED_DIR}/Absyn.H
+            ${GENERATED_DIR}/Printer.C
+            ${GENERATED_DIR}/Printer.H
+            ${GENERATED_DIR}/Buffer.C
+            ${GENERATED_DIR}/Buffer.H
+            ${GENERATED_DIR}/grammar.y
+            ${GENERATED_DIR}/grammar.l
+            ${GENERATED_DIR}/Parser.H
+            ${GENERATED_DIR}/ParserError.H
+            ${GENERATED_DIR}/Skeleton.C
+            ${GENERATED_DIR}/Skeleton.H
+            ${GENERATED_DIR}/Test.C
+            ${GENERATED_DIR}/Parser.C
+            ${GENERATED_DIR}/Bison.H
+            ${GENERATED_DIR}/Lexer.C
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${GENERATED_DIR}
+        COMMAND ${BNFC_EXECUTABLE} --cpp -o ${GENERATED_DIR} ${BNFC_INPUT}
+        # Fix grammar.y before Bison copies its parser entry points to Parser.C.
+        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/PatchGenerated.cmake
         COMMAND ${BISON_EXECUTABLE} -t -pgrammar_ -d ${GENERATED_DIR}/grammar.y -o ${GENERATED_DIR}/Parser.C
-        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/PatchGenerated.cmake
-        DEPENDS ${GENERATED_DIR}/grammar.y BNFCGen
-        WORKING_DIRECTORY ${GENERATED_DIR}
-        COMMENT "Running Bison on grammar.y and patching output"
-        VERBATIM
-    )
-
-    add_custom_command(
-        OUTPUT ${GENERATED_DIR}/Lexer.C
-        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/PatchGenerated.cmake
         COMMAND ${FLEX_EXECUTABLE} -Pgrammar_ --noline -o${GENERATED_DIR}/Lexer.C ${GENERATED_DIR}/grammar.l
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/PatchGenerated.cmake
-        DEPENDS ${GENERATED_DIR}/grammar.l ${GENERATED_DIR}/Bison.H BNFCGen
-        WORKING_DIRECTORY ${GENERATED_DIR}
-        COMMENT "Patching grammar.l, running Flex, and patching Lexer.C"
+        COMMAND ${CMAKE_COMMAND} -E touch ${PARSER_GENERATION_STAMP}
+        DEPENDS ${BNFC_INPUT} ${CMAKE_CURRENT_BINARY_DIR}/PatchGenerated.cmake
+        COMMENT "Generating and patching the BNFC, Bison and Flex parser files"
         VERBATIM
     )
 
-    # Create targets for parser generation
-    add_custom_target(ParserGen
-        DEPENDS ${GENERATED_DIR}/Parser.C ${GENERATED_DIR}/Lexer.C ${GENERATED_DIR}/Bison.H
-    )
+    add_custom_target(BNFCGen DEPENDS ${PARSER_GENERATION_STAMP})
+    add_custom_target(ParserGen)
+    add_dependencies(ParserGen BNFCGen)
 
 else()
     message(STATUS "Skipping BNFC generation as BNFC is not set")
@@ -234,6 +202,7 @@ endif()
 # Add clean target for generated files
 add_custom_target(clean-generated
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${GENERATED_DIR}
+    COMMAND ${CMAKE_COMMAND} -E rm -f "${CMAKE_CURRENT_BINARY_DIR}/parser-generation.stamp"
     COMMENT "Cleaning generated parser files"
 )
 
@@ -300,6 +269,11 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     include(CTest)
 
     if(BUILD_TESTING)
+        add_test(NAME GeneratedParserPatchTest COMMAND ${CMAKE_COMMAND}
+            "-DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
+            "-DBINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/GeneratedParserPatchTest.cmake")
+
         # Query namespace tests
         add_executable(QueryNamespaceTests tests/QueryNamespaceTests.cpp)
         target_link_libraries(QueryNamespaceTests PRIVATE VNNLib)

@@ -1,6 +1,8 @@
-# Unreleased (up to 2026-09-08)
+# Unreleased (up to 2026-10-06)
 
 * Moved the C++ Query API into the `vnnlib::query` namespace. Existing global names remain available for backwards compatibility and are marked `[[deprecated]]`.
+
+* Standardised the Query API to use `isomorphic-to` (and the corresponding variable names) instead of `isometric-to`.
 
 # Version 1.1
 

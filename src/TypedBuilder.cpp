@@ -336,7 +336,7 @@ void TypedBuilder::visitIsomorphicTo(IsomorphicTo *p) {
     TypeChecker::visitIsomorphicTo(p);
 
     if (!netStack_.empty()) {
-        netStack_.back()->isometricTo = p->variablename_->string_;
+        netStack_.back()->isomorphicTo = p->variablename_->string_;
     }
 }
 

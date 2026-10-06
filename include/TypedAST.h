@@ -257,7 +257,7 @@ protected:
 class VNNLIB_API TNetworkDefinition final : public TNode {
 friend class TypedBuilder;
 public:
-	std::string isometricTo{};
+	std::string isomorphicTo{};
 	std::string equalTo{};
 	std::string networkName{};
 	std::vector<std::unique_ptr<TInputDefinition>> inputs{};

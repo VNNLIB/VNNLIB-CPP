@@ -768,7 +768,7 @@ void TypeChecker::validateVariableAccess(const VariableName* name) {
     }
 }
 
-// Helper method to validate whether two networks are congruent (isometric or equal graphs)
+// Helper method to validate whether two networks are congruent (isomorphic or equal graphs)
 void TypeChecker::validateNetworkCongruence(VariableName* referencedNetworkName, const std::string& statementType) {
     std::string referencedName = referencedNetworkName->string_;
     auto it = networks.find(referencedName);

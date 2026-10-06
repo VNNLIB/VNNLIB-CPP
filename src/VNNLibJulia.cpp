@@ -854,14 +854,14 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
         .method("name", [](const std::shared_ptr<TNetworkDefinition>& net) {
             return net ? net->networkName : std::string("");
         })
-        .method("net_isometric_to", [](const TNetworkDefinition& net) {
-            return net.isometricTo;
+        .method("net_isomorphic_to", [](const TNetworkDefinition& net) {
+            return net.isomorphicTo;
         })
-        .method("net_isometric_to", [](const TNetworkDefinition* net) {
-            return net ? net->isometricTo : std::string("");
+        .method("net_isomorphic_to", [](const TNetworkDefinition* net) {
+            return net ? net->isomorphicTo : std::string("");
         })
-        .method("net_isometric_to", [](const std::shared_ptr<TNetworkDefinition>& net) {
-            return net ? net->isometricTo : std::string("");
+        .method("net_isomorphic_to", [](const std::shared_ptr<TNetworkDefinition>& net) {
+            return net ? net->isomorphicTo : std::string("");
         })
         .method("net_equal_to", [](const TNetworkDefinition& net) {
             return net.equalTo;

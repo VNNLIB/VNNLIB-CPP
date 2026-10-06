@@ -332,7 +332,7 @@ TMultipleNetworks TQuery::multipleNetworksTheory() {
     int equalCount = 0, isomorphicCount = 0;
     for (const auto& network : networks) {
         if (!network->equalTo.empty()) equalCount++;
-        if (!network->isometricTo.empty() || !network->equalTo.empty()) isomorphicCount++;
+        if (!network->isomorphicTo.empty() || !network->equalTo.empty()) isomorphicCount++;
     }
 
     // If there are multiple network declarations and all but one contains an equal-to, it is MENET
